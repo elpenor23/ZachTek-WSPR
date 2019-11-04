@@ -6,67 +6,12 @@ import getpass
 import serial.tools.list_ports
 from datetime import datetime
 from obj.ErrorObjects import logError, ErrorLevel
+from obj.CommandEnums import CommandType, Command
 import time
 import random
 import os
-import enum
 
 class WSPRInterfaceManager:
-
-    ###########################################
-    # START - Get Methods
-    ###########################################
-    def getCallSign(self, port, deviceconstants):
-        command = self.createCommand(deviceconstants.commands, CommandType.GET, Command.CALLSIGN)
-        self.sendCommand(port, command)
-        return
-
-    def getStartUpMode(self, port, deviceconstants):
-        command = self.createCommand(deviceconstants.commands, CommandType.GET, Command.STARTUPMODE)
-        self.sendCommand(port, command)
-        return
-    
-    def getCurrentMode(self, port, deviceconstants):
-        command = self.createCommand(deviceconstants.commands, CommandType.GET, Command.CURRENTMODE)
-        self.sendCommand(port, command)
-        return
-
-    def getPower(self, port, deviceconstants):
-        command = self.createCommand(deviceconstants.commands, CommandType.GET, Command.POWER)
-        self.sendCommand(port, command)
-        return
-
-    def getGeneratorFequency(self, port, deviceconstants):
-        command = self.createCommand(deviceconstants.commands, CommandType.GET, Command.GENERATORFREQUENCY)
-        self.sendCommand(port, command)
-        return
-    
-    def getBands(self, port, deviceconstants):
-        command = self.createCommand(deviceconstants.commands, CommandType.GET, Command.BANDS)
-        self.sendCommand(port, command)
-        return
-    ###########################################
-    # END - Get Methods
-    ###########################################
-    
-    ###########################################
-    # START - Set Methods
-    ###########################################  
-    def setBands(self, port, bands):
-        return True
-
-    def setStartupMode(self, port, mode):
-        return True
-    
-    def setCurrentMode(self, port, bands):
-        return True
-
-    def setCallsign(self, port, bands):
-        return True
-    ###########################################
-    # END - Get Methods
-    ###########################################
-
     ###########################################
     # START - Port Functions
     ###########################################
@@ -124,7 +69,7 @@ class WSPRInterfaceManager:
     # END - Port Functions
     ###########################################
     #creates commands to send to the device
-    def createCommand(self, commands, type, command):
+    def createCommand(self, commands, type, command, value = ""):
         commandString = ""
         
         if command == Command.CALLSIGN:
@@ -138,19 +83,20 @@ class WSPRInterfaceManager:
         elif command == Command.POWER:
             commandString = commands.get.power
         elif command == Command.GENERATORFREQUENCY:
-            commandString = commands.get.generatorfrequency 
+            commandString = commands.get.generatorfrequency
+        #ELIF for next command
         else:
             print("Unknown Command!")
-        #ELIF for next command
 
         if type == CommandType.GET:
                 commandString += commands.get.char + commands.commandEndChars
         elif type == CommandType.SET:
-            commandString += commands.set.char + commands.commandEndChars
+            commandString += commands.set.char + " " + value + " " + commands.commandEndChars
         
         return commandString.encode("utf-8")
     
-    def sendCommand(self, ser, commandToSend):
+    def sendCommand(self, ser, commands, commandType, command, value = ""):
+        commandToSend = self.createCommand(commands, commandType, command, value)
         self.waitForPort(ser)
         ser.write(commandToSend)
         return
@@ -159,16 +105,3 @@ class WSPRInterfaceManager:
         while not ser.inWaiting():
             time.sleep(.1)
         return
-
-class CommandType(enum.Enum):
-    GET = 1
-    SET = 2
-    RESPONCE = 3
-
-class Command(enum.Enum):
-    CALLSIGN = 1
-    BANDS = 2
-    STARTUPMODE = 3
-    CURRENTMODE = 4
-    POWER = 5
-    GENERATORFREQUENCY = 6

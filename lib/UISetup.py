@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import (QWidget, QProgressBar, QLabel, QLineEdit, QRadioBut
 from obj.WSPRInterfaceObjects import WSPRInterfaceObject
 from obj.AutoDetectionThread import AutoDetectionThread
 from obj.DeviceCommunicationThread import DeviceCommunicationThread
+from obj.CommandEnums import CommandType, Command
 import ast
 
 class WSPRUI(QWidget):
@@ -45,6 +46,12 @@ class WSPRUI(QWidget):
 
         self.textArea = QPlainTextEdit()
         
+        self.commandArray = [Command.CALLSIGN,
+                             Command.BANDS,
+                             Command.STARTUPMODE,
+                             Command.CURRENTMODE,
+                             Command.POWER,
+                             Command.GENERATORFREQUENCY]
         #Create the UI
         self.initUI()
         
@@ -128,11 +135,11 @@ class WSPRUI(QWidget):
         tempLayout = QGridLayout()
         buttonReload = QPushButton("Reload")
         buttonReload.setFixedSize(100, 50)
-        buttonReload.clicked.connect(self.handleButtonPush)
+        buttonReload.clicked.connect(self.handleReloadPush)
 
         buttonSave = QPushButton("Save")
         buttonSave.setFixedSize(100, 50)
-        buttonSave.clicked.connect(self.handleButtonPush)
+        buttonSave.clicked.connect(self.handleSavePush)
         
 
         tempLayout.addWidget(buttonReload, 0, 0)
@@ -310,8 +317,12 @@ class WSPRUI(QWidget):
             self.wsprDevice.config.debug = True
         return
 
-    def handleButtonPush(self):
-        self.deviceCommunicationThread.writeCommand(self.wsprDevice.config.deviceconstants.commands.responcestoload)
+    def handleReloadPush(self):
+        self.deviceCommunicationThread.getCommand(CommandType.GET, self.commandArray)
+        return
+    
+    def handleSavePush(self):
+        self.deviceCommunicationThread.getCommand(CommandType.GET, self.commandArray)
         return
 
     #####################################
@@ -326,7 +337,7 @@ class WSPRUI(QWidget):
         self.autoDetecThread.pause()   
         self.setConnectionStatus()
         self.deviceCommunicationThread.start()
-        self.deviceCommunicationThread.writeCommand(self.wsprDevice.config.deviceconstants.commands.responcestoload)
+        self.deviceCommunicationThread.getCommand(CommandType.GET, self.commandArray)
         return
     
     def callbackDeviceRead(self, readText):

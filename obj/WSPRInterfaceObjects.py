@@ -147,21 +147,8 @@ class WSPRInterfaceObject:
         data = self.WSPRInterfaceManager.readSerialPort(self.port)
         return data
     
-    def WriteCommand(self, command):
-        if command == self.config.deviceconstants.commands.responce.callsign:
-            self.WSPRInterfaceManager.getCallSign(self.port, self.config.deviceconstants)
-        elif command == self.config.deviceconstants.commands.responce.startupmode:
-            self.WSPRInterfaceManager.getStartUpMode(self.port, self.config.deviceconstants)
-        elif command == self.config.deviceconstants.commands.responce.currentmode:
-            self.WSPRInterfaceManager.getCurrentMode(self.port, self.config.deviceconstants)
-        elif command == self.config.deviceconstants.commands.responce.power:
-            self.WSPRInterfaceManager.getPower(self.port, self.config.deviceconstants)
-        elif command == self.config.deviceconstants.commands.responce.generatorfrequency:
-            self.WSPRInterfaceManager.getGeneratorFequency(self.port, self.config.deviceconstants)
-        elif command == self.config.deviceconstants.commands.responce.bands:
-            self.WSPRInterfaceManager.getBands(self.port, self.config.deviceconstants)
-        else:
-            print("WSPR Interface Object WriteCommand() Invalid Command!")
+    def WriteCommand(self, commandType, command):
+        self.WSPRInterfaceManager.sendCommand(self.port, self.config.deviceconstants.commands, commandType, command)
         return
     ###########################
     #END Methods
