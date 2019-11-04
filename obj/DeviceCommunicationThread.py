@@ -142,6 +142,7 @@ class DeviceCommunicationThread(QtCore.QThread):
     ###################################
     def updateAverageGPSData(self, newSignalData):
         newGPSSignalData = int(newSignalData)
+        #create the array of GPS signals to average
         if len(self.gpsDataSignalData) < 4:
             self.gpsDataSignalData.append(newGPSSignalData)
         else:
@@ -156,7 +157,7 @@ class DeviceCommunicationThread(QtCore.QThread):
                 self.gpsDataSignalData.remove(itemToRemove)
                 self.gpsDataSignalData.append(newGPSSignalData)
 
-        #now do calculate the average
+        #now calculate the average
         totalData = 0
         dataCount = 0
         for data in self.gpsDataSignalData:
@@ -172,8 +173,9 @@ class DeviceCommunicationThread(QtCore.QThread):
 
     def processBands(self, responce, value):
         self.bandsDataOngoing = True
+        bandValue = value.split()[1]
         if len(self.wsprDevice.bands)-1 >= self.bandIndex:
-            self.wsprDevice.bands[self.bandIndex][1] = value
+            self.wsprDevice.bands[self.bandIndex][2] = bandValue
             self.bandIndex += 1
         
         return
