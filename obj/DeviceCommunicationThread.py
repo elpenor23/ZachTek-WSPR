@@ -145,13 +145,14 @@ class DeviceCommunicationThread(QtCore.QThread):
         if len(self.gpsDataSignalData) < 4:
             self.gpsDataSignalData.append(newGPSSignalData)
         else:
-            itemToRemove = 0
+            itemToRemove = 101
             for val in self.gpsDataSignalData:
-                data = int(val)
-                if newGPSSignalData > data:
-                    if itemToRemove > data:
-                        itemToRemove = data
-            if itemToRemove > 0:
+                aryVal = int(val)
+                if newGPSSignalData > aryVal:
+                    if aryVal < itemToRemove:
+                        itemToRemove = aryVal
+                        
+            if itemToRemove < 101:
                 self.gpsDataSignalData.remove(itemToRemove)
                 self.gpsDataSignalData.append(newGPSSignalData)
 
@@ -167,9 +168,8 @@ class DeviceCommunicationThread(QtCore.QThread):
             self.gpsDataSignalAverage = totalData/dataCount
         else:
             self.gpsDataSignalAverage = 0
-
         return
-    
+
     def processBands(self, responce, value):
         self.bandsDataOngoing = True
         if len(self.wsprDevice.bands)-1 >= self.bandIndex:
