@@ -1,8 +1,11 @@
 #!/usr/bin/python3
 import time
-from PySide2 import QtCore
+from PyQt5 import QtCore
 
 class WriteDeviceThread(QtCore.QThread):
+    write = QtCore.pyqtSignal(bool)
+    exception = QtCore.pyqtSignal(str)
+    
     def __init__(self, wsprDevice):
         QtCore.QThread.__init__(self)
         self.wsprDevice = wsprDevice
@@ -30,7 +33,7 @@ class WriteDeviceThread(QtCore.QThread):
                 for command in commandArray:
                     self.wsprDevice.WriteCommand(command)
 
-                self.emit( QtCore.SIGNAL('write(bool)'), True)
+                self.write.emit(True)
             except:
-                self.emit( QtCore.SIGNAL('exception(QString)'), "Write Failed. Device disconnected.")
+                self.exception.emit("Write Failed. Device disconnected.")
         return

@@ -71,7 +71,7 @@ class WSPRInterfaceManager:
     # START - Port Functions
     ###########################################
     #detect which port the wspr transmitter is on
-    def detectTransmitter(self, portList, checkSecurity, securityErrorMessage, correctResponce, portReadTimeout):
+    def detectTransmitter(self, portList, checkSecurity, securityErrorMessage, correctResponce, portReadTimeout, commandEndChars):
         connectedPort = None
         responce = ""
         for portName in portList:
@@ -89,7 +89,7 @@ class WSPRInterfaceManager:
                 errMsg = securityErrorMessage.format(getpass.getuser())
                 logError(ErrorLevel.HIGH, errMsg)
                 connectedPort = None
-        returnTuple = (connectedPort, responce.replace("\r\n", ""))
+        returnTuple = (connectedPort, responce.replace(commandEndChars, ""))
         return returnTuple
         
     def openSerialPort(self, portName, readTimeoutSeconds):

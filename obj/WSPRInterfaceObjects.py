@@ -136,7 +136,12 @@ class WSPRInterfaceObject:
     ############################
     def DetectPort(self):
         #print(self.allPorts)
-        return self.WSPRInterfaceManager.detectTransmitter(self.allPorts, self.config.checkSecurity, self.config.securityErrorMessage, self.config.deviceconstants.commands.responce.deviceinfo, self.config.readDeviceTimeout)
+        return self.WSPRInterfaceManager.detectTransmitter(self.allPorts,
+                                                           self.config.checkSecurity,
+                                                           self.config.securityErrorMessage,
+                                                           self.config.deviceconstants.commands.responce.deviceinfo,
+                                                           self.config.readDeviceTimeout,
+                                                           self.config.deviceconstants.commands.commandEndChars)
 
     def ReadData(self):
         data = self.WSPRInterfaceManager.readSerialPort(self.port)

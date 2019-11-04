@@ -1,14 +1,16 @@
 #!/usr/bin/python3
 #Creates and sets up the GUI
 #This is what controls all the GUI and connects things to the 
-#intereface
-from PySide2 import QtWidgets, QtGui, QtCore
+#interface
+from PyQt5 import QtGui, QtCore
+from PyQt5.QtWidgets import (QWidget, QProgressBar, QLabel, QLineEdit, QRadioButton,
+            QPlainTextEdit, QGridLayout, QGroupBox, QCheckBox, QPushButton, QSizePolicy)
 from obj.WSPRInterfaceObjects import WSPRInterfaceObject
 from obj.AutoDetectionThread import AutoDetectionThread
 from obj.DeviceCommunicationThread import DeviceCommunicationThread
 import ast
 
-class WSPRUI(QtWidgets.QWidget):
+class WSPRUI(QWidget):
     def __init__(self, configFile):
         super(WSPRUI, self).__init__()
 
@@ -16,32 +18,32 @@ class WSPRUI(QtWidgets.QWidget):
         self.wsprDevice = WSPRInterfaceObject(configFile)
         
         self.bandCheckboxes = []
-        self.CurrentGPSStatus = QtWidgets.QProgressBar(self)
-        self.gpsTime = QtWidgets.QLabel("00:00:00")
-        self.gpsPosition = QtWidgets.QLabel("0000")
-        self.gpsPower = QtWidgets.QLabel("0")
-        self.outputFreq = QtWidgets.QLabel("000 000 000.00")
-        self.gpsLocked = QtWidgets.QLabel("GPS Signal Quality:")
+        self.CurrentGPSStatus = QProgressBar(self)
+        self.gpsTime = QLabel("00:00:00")
+        self.gpsPosition = QLabel("0000")
+        self.gpsPower = QLabel("0")
+        self.outputFreq = QLabel("000 000 000.00")
+        self.gpsLocked = QLabel("GPS Signal Quality:")
         
-        self.portConnectionIcon = QtWidgets.QLabel()
+        self.portConnectionIcon = QLabel()
         self.portConnectionIcon.setFixedSize(50, 50)
         self.portConnectionIcon.mousePressEvent = self.handleConnectionIconClick
 
         self.portActive = False
 
-        self.txtCallsign = QtWidgets.QLineEdit()
+        self.txtCallsign = QLineEdit()
 
-        self.portConnectionLabel = QtWidgets.QLabel(self.wsprDevice.config.notconnectedtext)
+        self.portConnectionLabel = QLabel(self.wsprDevice.config.notconnectedtext)
 
-        self.rdoStartUpSignalGen = QtWidgets.QRadioButton("Signal Generator")
-        self.rdoStartUpWSPRBeacon = QtWidgets.QRadioButton("WSPR Beacon")
-        self.rdoStartUpIdle = QtWidgets.QRadioButton("Idle")
+        self.rdoStartUpSignalGen = QRadioButton("Signal Generator")
+        self.rdoStartUpWSPRBeacon = QRadioButton("WSPR Beacon")
+        self.rdoStartUpIdle = QRadioButton("Idle")
 
-        self.rdoCurrentSignalGen = QtWidgets.QRadioButton("Signal Generator")
-        self.rdoCurrentWSPRBeacon = QtWidgets.QRadioButton("WSPR Beacon")
-        self.rdoCurrentIdle = QtWidgets.QRadioButton("Idle")
+        self.rdoCurrentSignalGen = QRadioButton("Signal Generator")
+        self.rdoCurrentWSPRBeacon = QRadioButton("WSPR Beacon")
+        self.rdoCurrentIdle = QRadioButton("Idle")
 
-        self.textArea = QtWidgets.QPlainTextEdit()
+        self.textArea = QPlainTextEdit()
         
         #Create the UI
         self.initUI()
@@ -55,7 +57,7 @@ class WSPRUI(QtWidgets.QWidget):
     #Add all the sections to the main window 
     def initUI(self):
 
-        windowLayout = QtWidgets.QGridLayout()
+        windowLayout = QGridLayout()
 
         #serial port section
         serialPort = self.initSerialPortFrame()
@@ -93,8 +95,8 @@ class WSPRUI(QtWidgets.QWidget):
 
     #Build section with port information
     def initSerialPortFrame(self):
-        sectionBox = QtWidgets.QGroupBox("Serial Port")
-        tempLayout = QtWidgets.QGridLayout()
+        sectionBox = QGroupBox("Serial Port")
+        tempLayout = QGridLayout()
 
         self.setConnectionStatus()
 
@@ -106,13 +108,13 @@ class WSPRUI(QtWidgets.QWidget):
 
     #create section for Band information
     def initBandsFrame(self):
-        sectionBox = QtWidgets.QGroupBox("Bands")
-        tempLayout = QtWidgets.QGridLayout()
+        sectionBox = QGroupBox("Bands")
+        tempLayout = QGridLayout()
         
         i=0
         for band in self.wsprDevice.bands:
             #for each band make a label and a button
-            checkbox = QtWidgets.QCheckBox(band[1])            
+            checkbox = QCheckBox(band[1])            
             tempLayout.addWidget(checkbox, i, 1)
             self.bandCheckboxes.append(checkbox)
             i+=1
@@ -122,13 +124,13 @@ class WSPRUI(QtWidgets.QWidget):
 
     #Create section for buttons
     def initButtonFrame(self):
-        sectionBox = QtWidgets.QGroupBox("Buttons")
-        tempLayout = QtWidgets.QGridLayout()
-        buttonReload = QtWidgets.QPushButton("Reload")
+        sectionBox = QGroupBox("Buttons")
+        tempLayout = QGridLayout()
+        buttonReload = QPushButton("Reload")
         buttonReload.setFixedSize(100, 50)
         buttonReload.clicked.connect(self.handleButtonPush)
 
-        buttonSave = QtWidgets.QPushButton("Save")
+        buttonSave = QPushButton("Save")
         buttonSave.setFixedSize(100, 50)
         buttonSave.clicked.connect(self.handleButtonPush)
         
@@ -140,8 +142,8 @@ class WSPRUI(QtWidgets.QWidget):
 
     #create setion for Callsign input
     def initCallsignFrame(self):
-        sectionBox = QtWidgets.QGroupBox("Callsign")
-        tempLayout = QtWidgets.QGridLayout()
+        sectionBox = QGroupBox("Callsign")
+        tempLayout = QGridLayout()
         
         tempLayout.addWidget(self.txtCallsign)
         sectionBox.setLayout(tempLayout)
@@ -149,8 +151,8 @@ class WSPRUI(QtWidgets.QWidget):
 
     #Create startup mode frame
     def initStartupModeFrame(self):
-        sectionBox = QtWidgets.QGroupBox("Start Up Configuration")
-        tempLayout = QtWidgets.QGridLayout()
+        sectionBox = QGroupBox("Start Up Configuration")
+        tempLayout = QGridLayout()
         
         tempLayout.addWidget(self.rdoStartUpSignalGen, 0, 0)
         tempLayout.addWidget(self.rdoStartUpWSPRBeacon, 1, 0)
@@ -161,44 +163,43 @@ class WSPRUI(QtWidgets.QWidget):
 
     #Create current status section
     def initCurrentStatus(self):
-        sectionBox = QtWidgets.QGroupBox("Current Status")
-        tempLayout = QtWidgets.QGridLayout()
+        sectionBox = QGroupBox("Current Status")
+        tempLayout = QGridLayout()
 
         #GPS Signal
-        tempLayout.addWidget(self.gpsLocked, 0, 0, columnSpan=3)
+        tempLayout.addWidget(self.gpsLocked, 1, 0, 1, 3)
 
-        #self.CurrentGPSStatus.setFixedWidth(200)
         self.CurrentGPSStatus.setTextVisible(True)
         self.CurrentGPSStatus.setValue(0)
-        tempLayout.addWidget(self.CurrentGPSStatus, 1, 0, 1, 3)
+        tempLayout.addWidget(self.CurrentGPSStatus, 2, 0, 1, 3)
 
         #GPS Time
-        gpsTimeLabel = QtWidgets.QLabel("GPS Time:")
-        tempLayout.addWidget(gpsTimeLabel, 2, 0)
-        tempLayout.addWidget(self.gpsTime, 2, 1, 1, 2)
+        gpsTimeLabel = QLabel("GPS Time:")
+        tempLayout.addWidget(gpsTimeLabel, 3, 0)
+        tempLayout.addWidget(self.gpsTime, 3, 1, 1, 2)
 
         #GPS Position
-        gpsPositionLabel = QtWidgets.QLabel("GPS Position:")
-        tempLayout.addWidget(gpsPositionLabel, 3, 0)
-        tempLayout.addWidget(self.gpsPosition, 3, 1, 1, 3)
+        gpsPositionLabel = QLabel("GPS Position:")
+        tempLayout.addWidget(gpsPositionLabel, 4, 0)
+        tempLayout.addWidget(self.gpsPosition, 4, 1, 1, 3)
 
         #Power
-        gpsPowerLabel = QtWidgets.QLabel("Reported Power: ")
-        tempLayout.addWidget(gpsPowerLabel, 4, 0)
-        tempLayout.addWidget(self.gpsPower, 4, 1)
-        gpsdBmLabel = QtWidgets.QLabel("dBm")
-        tempLayout.addWidget(gpsdBmLabel, 4, 2)
-
-        #Output Frequency
-        gpsPowerLabel = QtWidgets.QLabel("Output Frequency: ")
+        gpsPowerLabel = QLabel("Reported Power: ")
         tempLayout.addWidget(gpsPowerLabel, 5, 0)
-        tempLayout.addWidget(self.outputFreq, 5, 1)
-        gpsdBmLabel = QtWidgets.QLabel("Hz")
+        tempLayout.addWidget(self.gpsPower, 5, 1)
+        gpsdBmLabel = QLabel("dBm")
         tempLayout.addWidget(gpsdBmLabel, 5, 2)
 
-        tempLayout.addWidget(self.rdoCurrentSignalGen, 6, 0, columnSpan=2)
-        tempLayout.addWidget(self.rdoCurrentWSPRBeacon, 7, 0, columnSpan=2)
-        tempLayout.addWidget(self.rdoCurrentIdle, 8, 0, columnSpan=2)
+        #Output Frequency
+        gpsPowerLabel = QLabel("Output Frequency: ")
+        tempLayout.addWidget(gpsPowerLabel, 6, 0)
+        tempLayout.addWidget(self.outputFreq, 6, 1)
+        gpsdBmLabel = QLabel("Hz")
+        tempLayout.addWidget(gpsdBmLabel, 6, 2)
+
+        tempLayout.addWidget(self.rdoCurrentSignalGen, 7, 0, 1, 2)
+        tempLayout.addWidget(self.rdoCurrentWSPRBeacon, 8, 0, 1, 2)
+        tempLayout.addWidget(self.rdoCurrentIdle, 9, 0, 1, 2)
 
         #Signal Frequency
         tempLayout.setAlignment(QtCore.Qt.AlignTop)
@@ -206,9 +207,9 @@ class WSPRUI(QtWidgets.QWidget):
         return sectionBox        
 
     def initDebugSection(self):
-        sectionBox = QtWidgets.QGroupBox("Debug")
-        tempLayout = QtWidgets.QGridLayout()
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        sectionBox = QGroupBox("Debug")
+        tempLayout = QGridLayout()
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
         self.textArea.setSizePolicy(sizePolicy)
         self.textArea.setFixedWidth(400)
         tempLayout.addWidget(self.textArea)
@@ -358,7 +359,7 @@ class WSPRUI(QtWidgets.QWidget):
             self.gpsTime.setText(request[1])
         elif request[0] == self.wsprDevice.config.deviceconstants.commands.responce.gpslocked:
             if request[1] == "T":
-                self.gpsLocked.setStyleSheet("color: lightgreen;")
+                self.gpsLocked.setStyleSheet("color: green;")
             else:
                 self.gpsLocked.setStyleSheet("color: white;")
 
@@ -379,17 +380,17 @@ class WSPRUI(QtWidgets.QWidget):
     def createThreads(self):
         #detect the wspr device
         self.autoDetecThread = AutoDetectionThread(self.wsprDevice)
-        self.connect( self.autoDetecThread, QtCore.SIGNAL("port(QString)"), self.callbackDetecionChange )
-        self.connect( self.autoDetecThread, QtCore.SIGNAL("read(QString)"), self.callbackDeviceRead )
+        self.autoDetecThread.port.connect(self.callbackDetecionChange)
+        self.autoDetecThread.read.connect(self.callbackDeviceRead)
         self.autoDetecThread.start()
 
         #Communicate with wspr device
         self.deviceCommunicationThread = DeviceCommunicationThread(self.wsprDevice)
-        self.connect( self.deviceCommunicationThread, QtCore.SIGNAL("display(QString)"), self.callbackDeviceRead )
-        self.connect( self.deviceCommunicationThread, QtCore.SIGNAL("update(QString)"), self.callbackDeviceFill )
-        self.connect( self.deviceCommunicationThread, QtCore.SIGNAL("realtime(QString)"), self.callbackDeviceRealTime )
-        self.connect( self.deviceCommunicationThread, QtCore.SIGNAL("exception(QString)"), self.callbackThreadException )
-
+        self.deviceCommunicationThread.display.connect(self.callbackDeviceRead)
+        self.deviceCommunicationThread.update.connect(self.callbackDeviceFill)
+        self.deviceCommunicationThread.realtime.connect(self.callbackDeviceRealTime)
+        self.deviceCommunicationThread.exception.connect(self.callbackThreadException)
+        
     def stopThreads(self):
         self.autoDetecThread.stop()
         self.deviceCommunicationThread.stop()

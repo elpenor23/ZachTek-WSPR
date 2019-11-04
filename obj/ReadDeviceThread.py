@@ -1,9 +1,12 @@
 #!/usr/bin/python3
 import time
-from PySide2 import QtCore
+from PyQt5 import QtCore
 import serial
 
 class ReadDeviceThread(QtCore.QThread):
+    read = QtCore.pyqtSignal(str)
+    exception = QtCore.pyqtSignal(str)
+    
     def __init__(self, wsprDevice):
         QtCore.QThread.__init__(self)
         self.wsprDevice = wsprDevice
@@ -16,11 +19,11 @@ class ReadDeviceThread(QtCore.QThread):
             time.sleep(.1)
             if not self.paused:
                 try:
-                    data = self.wsprDevice.ReadData().replace("\r\n", "")
-                    self.emit( QtCore.SIGNAL('read(QString)'), data)
+                    data = self.wsprDevice.ReadData().replace(self.wsprDevice.config.deviceconstants.commands.commandEndChars, "")
+                    self.read.emit(data)
                 except serial.serialutil.SerialException:
                     self.paused = True
-                    self.emit( QtCore.SIGNAL('exception(QString)'), "Read Failed. Device disconnected.")
+                    self.exception.emit("Read Failed. Device disconnected.")
                 
         return
 

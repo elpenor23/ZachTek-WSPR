@@ -1,14 +1,18 @@
 #!/usr/bin/python3
 import time
-from PySide2 import QtCore
+#from PySide2 import QtCore
+from PyQt5 import QtCore
 
 class AutoDetectionThread(QtCore.QThread):
+    port = QtCore.pyqtSignal(str)
+    read = QtCore.pyqtSignal(str)
+        
     def __init__(self, wsprDevice):
         QtCore.QThread.__init__(self)
         self.wsprDevice = wsprDevice
         self.keep_going = True
         self.paused = False
-
+        
     def run(self):
         #keep checking for devices being plugged or un plugged
         while self.keep_going:
@@ -21,9 +25,9 @@ class AutoDetectionThread(QtCore.QThread):
                     returnMessage = data[1]
                     if returnPort is not None:
                         self.wsprDevice.port = returnPort
-                        self.paused = True         
-                        self.emit( QtCore.SIGNAL('port(QString)'), returnPort.port)
-                        self.emit( QtCore.SIGNAL('read(QString)'), returnMessage)
+                        self.paused = True
+                        self.port.emit(returnPort.port)
+                        self.read.emit(returnMessage)
             time.sleep(2)
         return
 

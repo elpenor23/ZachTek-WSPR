@@ -1,10 +1,16 @@
 #!/usr/bin/python3
 import time
-from PySide2 import QtCore
+from PyQt5 import QtCore
 from obj.ReadDeviceThread import ReadDeviceThread
 from obj.WriteDeviceThread import WriteDeviceThread
 
 class DeviceCommunicationThread(QtCore.QThread):
+    display = QtCore.pyqtSignal(str)
+    update = QtCore.pyqtSignal(str)
+    realtime = QtCore.pyqtSignal(str)
+    exception = QtCore.pyqtSignal(str)
+    
+    
     def __init__(self, wsprDevice):
         QtCore.QThread.__init__(self)
         self.wsprDevice = wsprDevice
@@ -17,6 +23,8 @@ class DeviceCommunicationThread(QtCore.QThread):
         self.gpsDataSignalData = []
         self.bandsDataOngoing = False
         self.bandIndex = 0
+        
+        self
 
     ###################################
     #START - Thread handling
@@ -24,13 +32,13 @@ class DeviceCommunicationThread(QtCore.QThread):
     def run(self):
         #Setup other threads
         self.readDeviceThread = ReadDeviceThread(self.wsprDevice)
-        self.connect( self.readDeviceThread, QtCore.SIGNAL("read(QString)"), self.callbackDeviceRead )
-        self.connect( self.readDeviceThread, QtCore.SIGNAL("exception(QString)"), self.callbackThreadException )
+        self.readDeviceThread.read.connect(self.callbackDeviceRead)
+        self.readDeviceThread.exception.connect(self.callbackThreadException)
         self.readDeviceThread.start()
 
         self.writeDeviceThread = WriteDeviceThread(self.wsprDevice)
-        self.connect( self.writeDeviceThread, QtCore.SIGNAL("write(bool)"), self.callbackDeviceWrite )
-        self.connect( self.writeDeviceThread, QtCore.SIGNAL("exception(QString)"), self.callbackThreadException )
+        self.writeDeviceThread.write.connect(self.callbackDeviceWrite)
+        self.writeDeviceThread.exception.connect(self.callbackThreadException)
         self.writeDeviceThread.start()
         return
 
@@ -71,8 +79,8 @@ class DeviceCommunicationThread(QtCore.QThread):
 
     def callbackDeviceRead(self, returnText):
         if self.wsprDevice.config.debug:
-            self.emit( QtCore.SIGNAL('display(QString)'), returnText)
-
+            self.display.emit(returnText)
+            
         responce = ""
         value = ""
         splitReturn = returnText.split(" ", 1)
@@ -87,23 +95,23 @@ class DeviceCommunicationThread(QtCore.QThread):
         if responce != self.wsprDevice.config.deviceconstants.commands.responce.bands and self.bandsDataOngoing:
             self.bandsDataOngoing = False
             self.bandIndex = 0
-            self.emit( QtCore.SIGNAL('update(QString)'), "")
-
+            self.update.emit("")
+            
         if responce in self.wsprDevice.config.deviceconstants.commands.responcestoload:
             if responce == self.wsprDevice.config.deviceconstants.commands.responce.bands:
                 self.processBands(responce, value)
             else:
-                self.emit( QtCore.SIGNAL('update(QString)'), responce + "," + value)
-
+                self.update.emit(responce + "," + value)
+                
         if responce in self.wsprDevice.config.deviceconstants.commands.realtimeresponces:
             self.returnRealTimeDataToUI(responce, value)
         
         if not self.wsprDevice.config.debug and responce in self.wsprDevice.config.deviceconstants.commands.alwaysdisplayresponces:
-            self.emit( QtCore.SIGNAL('display(QString)'), returnText)
+            self.display.emit(returnText)
         return
     
     def callbackThreadException(self, error):
-        self.emit( QtCore.SIGNAL('exception(QString)'), error)
+        self.exception.emit(error)
     ###################################
     #END - Thread Callbacks
     ###################################
@@ -116,11 +124,11 @@ class DeviceCommunicationThread(QtCore.QThread):
             self.gpsDataOnging = True
             self.updateAverageGPSData(value.split()[3])
         else:
-            self.emit( QtCore.SIGNAL('realtime(QString)'), responce + "," + value)
-
+            self.realtime.emit(responce + "," + value)
+            
     def returnGPSSignalDataAverage(self):
         returnValue = self.wsprDevice.config.deviceconstants.commands.responce.gpssatdata + "," + str(self.gpsDataSignalAverage)
-        self.emit( QtCore.SIGNAL('realtime(QString)'), returnValue)
+        self.realtime.emit(returnValue)
         self.gpsDataOnging = False
         self.gpsDataSignalAverage = 0
         self.gpsDataSignalData = []
