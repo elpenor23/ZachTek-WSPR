@@ -44,6 +44,11 @@ class WSPRUI(QWidget):
         self.rdoCurrentWSPRBeacon = QRadioButton("WSPR Beacon")
         self.rdoCurrentIdle = QRadioButton("Idle")
 
+        self.buttonReload = QPushButton("Reload")
+        self.buttonReload.setFixedSize(100, 50)
+        self.buttonReload.clicked.connect(self.handleReloadPush)
+        self.buttonReload.setVisible(self.wsprDevice.config.debug)
+
         self.textArea = QPlainTextEdit()
         self.textArea.setMaximumBlockCount(self.wsprDevice.config.debugAreaMaximumBlockCount)
         self.textArea.setReadOnly(True)
@@ -135,16 +140,12 @@ class WSPRUI(QWidget):
     def initButtonFrame(self):
         sectionBox = QGroupBox("Buttons")
         tempLayout = QGridLayout()
-        buttonReload = QPushButton("Reload")
-        buttonReload.setFixedSize(100, 50)
-        buttonReload.clicked.connect(self.handleReloadPush)
-
+        
         buttonSave = QPushButton("Save")
         buttonSave.setFixedSize(100, 50)
         buttonSave.clicked.connect(self.handleSavePush)
         
-
-        tempLayout.addWidget(buttonReload, 0, 0)
+        tempLayout.addWidget(self.buttonReload, 0, 0)
         tempLayout.addWidget(buttonSave, 0, 1)
         sectionBox.setLayout(tempLayout)
         return sectionBox
@@ -220,7 +221,8 @@ class WSPRUI(QWidget):
         tempLayout = QGridLayout()
         sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
         self.textArea.setSizePolicy(sizePolicy)
-        self.textArea.setFixedWidth(400)
+        self.textArea.setMinimumWidth(400)
+        #self.textArea.setFixedWidth(400)
         tempLayout.addWidget(self.textArea)
 
         sectionBox.setLayout(tempLayout)
@@ -321,10 +323,8 @@ class WSPRUI(QWidget):
     #START - UI Event Handlers
     #####################################
     def handleConnectionIconClick(self, arg2 = None):
-        if self.wsprDevice.config.debug:
-            self.wsprDevice.config.debug = False
-        else:
-            self.wsprDevice.config.debug = True
+        self.wsprDevice.config.debug = not self.wsprDevice.config.debug
+        self.buttonReload.setVisible(self.wsprDevice.config.debug)
         return
 
     def handleReloadPush(self):

@@ -15,7 +15,7 @@
             ["12", "4m (70.092,500 MHz)", "D"]
         ],
     "readdevicetimeout": 5,
-    "debug": true,
+    "debug": false,
     "about": {
         "version": "0.0.1",
         "name": "ZachTek WSPR GUI"
