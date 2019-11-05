@@ -118,11 +118,7 @@ class WSPRInterfaceObject:
 
     #Port List getter
     def get_portList(self):
-        ports = []
-        if self.config.useAutomaticPorts:
-            ports = self.WSPRInterfaceManager.GetPortList()
-        else:
-            ports = self.config.manualPorts
+        ports = self.WSPRInterfaceManager.GetPortList()
         return ports
 
     allPorts = property(get_portList)
@@ -147,8 +143,8 @@ class WSPRInterfaceObject:
         data = self.WSPRInterfaceManager.readSerialPort(self.port)
         return data
     
-    def WriteCommand(self, commandType, command):
-        self.WSPRInterfaceManager.sendCommand(self.port, self.config.deviceconstants.commands, commandType, command)
+    def WriteCommand(self, commandType, command, value = ""):
+        self.WSPRInterfaceManager.sendCommand(self.port, self.config.deviceconstants.commands, commandType, command, value)
         return
     ###########################
     #END Methods

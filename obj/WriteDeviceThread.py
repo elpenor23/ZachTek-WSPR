@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 import time
 from PyQt5 import QtCore
-
+from obj.CommandEnums import CommandType, Command
 
 class WriteDeviceThread(QtCore.QThread):
     write = QtCore.pyqtSignal(bool)
@@ -28,13 +28,20 @@ class WriteDeviceThread(QtCore.QThread):
         self.paused = False
         return
 
-    def getCommand(self, commandType, commandArray):
+    def sendCommand(self, commandType, commandArray, valueArray = []):
         if not self.paused:
+            i = 0
             try:
                 for command in commandArray:
-                    self.wsprDevice.WriteCommand(commandType, command)
-                
+                    if commandType == CommandType.GET:
+                        self.wsprDevice.WriteCommand(commandType, command)
+                    else:
+                        self.wsprDevice.WriteCommand(commandType, command, valueArray[i])
+                        self.wsprDevice.WriteCommand(CommandType.SET, Command.SAVE)
+                        i += 1
+                    
                 self.write.emit(True)
-            except:
+            except Exception as ex:
                 self.exception.emit("Write Failed. Device disconnected.")
         return
+    

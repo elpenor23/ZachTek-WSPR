@@ -84,6 +84,8 @@ class WSPRInterfaceManager:
             commandString = commands.get.power
         elif command == Command.GENERATORFREQUENCY:
             commandString = commands.get.generatorfrequency
+        elif command == Command.SAVE:
+            commandString = commands.set.save
         #ELIF for next command
         else:
             print("Unknown Command!")
@@ -93,6 +95,7 @@ class WSPRInterfaceManager:
         elif type == CommandType.SET:
             commandString += commands.set.char + " " + value + " " + commands.commandEndChars
         
+        #print("Created Command: " + commandString)
         return commandString.encode("utf-8")
     
     def sendCommand(self, ser, commands, commandType, command, value = ""):

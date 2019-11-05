@@ -12,3 +12,4 @@ class Command(enum.Enum):
     CURRENTMODE = 4
     POWER = 5
     GENERATORFREQUENCY = 6
+    SAVE = 7

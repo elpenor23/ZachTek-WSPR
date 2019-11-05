@@ -61,11 +61,11 @@ class DeviceCommunicationThread(QtCore.QThread):
         self.writeDeviceThread.resume()
         return
 
-    def getCommand(self, commandType, command):
+    def sendCommand(self, commandType, commands, values = []):
         while self.readDeviceThread is None:
             time.sleep(.1)
         self.readDeviceThread.pause()
-        self.writeDeviceThread.getCommand(commandType, command)
+        self.writeDeviceThread.sendCommand(commandType, commands, values)
     ###################################
     #END - Thread handling
     ###################################

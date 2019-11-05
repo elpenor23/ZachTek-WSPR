@@ -318,11 +318,52 @@ class WSPRUI(QWidget):
         return
 
     def handleReloadPush(self):
-        self.deviceCommunicationThread.getCommand(CommandType.GET, self.commandArray)
+        self.deviceCommunicationThread.sendCommand(CommandType.GET, self.commandArray)
         return
     
     def handleSavePush(self):
-        self.deviceCommunicationThread.getCommand(CommandType.GET, self.commandArray)
+        commands = [Command.CURRENTMODE,
+                    Command.STARTUPMODE,
+                    Command.CALLSIGN
+                    ]
+        startUpModeValue = ""
+        if self.rdoStartUpIdle.isChecked():
+            startUpModeValue = self.wsprDevice.config.deviceconstants.modeIdleChar
+        if self.rdoStartUpSignalGen.isChecked():
+            startUpModeValue = self.wsprDevice.config.deviceconstants.modeSignalChar
+        if self.rdoStartUpWSPRBeacon.isChecked():
+            startUpModeValue = self.wsprDevice.config.deviceconstants.modeWSPRChar
+        
+        currentModeValue = ""
+        if self.rdoCurrentIdle.isChecked():
+            currentModeValue = self.wsprDevice.config.deviceconstants.modeIdleChar
+        if self.rdoCurrentSignalGen.isChecked():
+            currentModeValue = self.wsprDevice.config.deviceconstants.modeSignalChar
+        if self.rdoStartUpWSPRBeacon.isChecked():
+            currentModeValue = self.wsprDevice.config.deviceconstants.modeWSPRChar
+
+        values = [currentModeValue,
+                    startUpModeValue,
+                    self.txtCallsign.text()
+                ]
+        
+        for i, checkbox in enumerate(self.bandCheckboxes):
+            commands.append(Command.BANDS)
+            if checkbox.isChecked():
+                checkboxValue = self.wsprDevice.config.deviceconstants.bandEnabledChar
+            else:
+                checkboxValue = self.wsprDevice.config.deviceconstants.bandDisabledChar
+
+            valueToSend = str(i).zfill(2) + " " + checkboxValue
+            values.append(valueToSend)
+
+        self.deviceCommunicationThread.sendCommand(CommandType.SET, commands, values)
+
+        self.wsprDevice.callsign = self.txtCallsign.text()
+        self.wsprDevice.startupMode = startUpModeValue
+        self.wsprDevice.currentMode = currentModeValue
+        #self.deviceCommunicationThread.sendCommand(CommandType.GET, commands)
+        
         return
 
     #####################################
@@ -337,7 +378,7 @@ class WSPRUI(QWidget):
         self.autoDetecThread.pause()   
         self.setConnectionStatus()
         self.deviceCommunicationThread.start()
-        self.deviceCommunicationThread.getCommand(CommandType.GET, self.commandArray)
+        self.deviceCommunicationThread.sendCommand(CommandType.GET, self.commandArray)
         return
     
     def callbackDeviceRead(self, readText):
@@ -370,9 +411,9 @@ class WSPRUI(QWidget):
             self.gpsTime.setText(request[1])
         elif request[0] == self.wsprDevice.config.deviceconstants.commands.responce.gpslocked:
             if request[1] == "T":
-                self.gpsLocked.setStyleSheet("color: green;")
+                self.gpsLocked.setStyleSheet(self.wsprDevice.config.gpsLockedTrueCSS)
             else:
-                self.gpsLocked.setStyleSheet("color: white;")
+                self.gpsLocked.setStyleSheet(self.wsprDevice.config.gpsLockedFalseCSS)
 
     def callbackThreadException(self, error):
         self.textArea.appendPlainText("EXCEPTION IN THREAD!")

@@ -43,8 +43,6 @@ class ConfigObject:
         self.notconnectedtext = configData["notConnectedText"]
         self.connectedtext = configData["connectedText"]
         self.bands = configData["bands"]
-        self.useAutomaticPorts = configData["useAutomaticPorts"]
-        self.autoDetectDevice = configData["autoDetectDevice"]
         self.readDeviceTimeout = configData["readdevicetimeout"]
 
         #icon data
@@ -57,13 +55,23 @@ class ConfigObject:
         #Security
         self.checkSecurity = configData["checkSecurity"]
         self.securityErrorMessage = configData["securityErrorMessage"]
+        
+        #gps config
+        self.gpsLockedFalseCSS = configData["gpsLockedFalseCSS"]
+        self.gpsLockedTrueCSS = configData["gpsLockedTrueCSS"]
 
         #Device Specific configuration
         self.deviceconstants = DeviceConstants()
+
         #band enabled/disabled chars
         self.deviceconstants.bandEnabledChar = configData["deviceconstants"]["bandEnabledChar"]
         self.deviceconstants.bandDisabledChar = configData["deviceconstants"]["bandDisabledChar"]
 
+        #mode values
+        self.deviceconstants.modeIdleChar = configData["deviceconstants"]["modeIdleChar"]
+        self.deviceconstants.modeSignalChar = configData["deviceconstants"]["modeSignalChar"]
+        self.deviceconstants.modeWSPRChar = configData["deviceconstants"]["modeWSPRChar"]
+        
         #Device Commands and responces
         self.deviceconstants.commands = CommandObject()
     
@@ -71,6 +79,7 @@ class ConfigObject:
         self.deviceconstants.commands.get.char = configData["deviceconstants"]["commands"]["get"]["char"]
         self.deviceconstants.commands.set.char = configData["deviceconstants"]["commands"]["set"]["char"]
         self.deviceconstants.commands.commandEndChars = configData["deviceconstants"]["commandEndChars"]
+        
         #callsign
         self.deviceconstants.commands.get.callsign = configData["deviceconstants"]["commands"]["get"]["callsign"]
         self.deviceconstants.commands.set.callsign = configData["deviceconstants"]["commands"]["set"]["callsign"]
@@ -106,6 +115,9 @@ class ConfigObject:
         self.deviceconstants.commands.realtimeresponces = configData["deviceconstants"]["commands"]["responce"]["realtimeresponces"]
         self.deviceconstants.commands.alwaysdisplayresponces = configData["deviceconstants"]["commands"]["responce"]["alwaysdisplayresponces"]
 
+        #Set Only
+        self.deviceconstants.commands.set.save = configData["deviceconstants"]["commands"]["set"]["save"]
+        
         #Responce Only
         self.deviceconstants.commands.responce.gpsposition = configData["deviceconstants"]["commands"]["responce"]["gpsposition"]
         self.deviceconstants.commands.responce.gpstime = configData["deviceconstants"]["commands"]["responce"]["gpstime"]
@@ -119,6 +131,10 @@ class DeviceConstants:
         self.commands = CommandObject()
         self.bandEnabledChar = ""
         self.bandDisabledChar = ""
+        self.modeIdleChar = ""
+        self.modeSignalChar = ""
+        self.modeWSPRChar = ""
+
 
 class CommandObject:
     def __init__(self):
@@ -139,6 +155,7 @@ class CommandObject:
 class RawCommandObject:
     def __init__(self):
         self.char = ""
+        self.save = ""
         self.callsign = ""
         self.bands = ""
         self.startupmode = ""
