@@ -49,6 +49,8 @@ class WSPRUI(QWidget):
         self.buttonReload.clicked.connect(self.handleReloadPush)
         self.buttonReload.setVisible(self.wsprDevice.config.debug)
 
+        self.debugSection = QGroupBox("Info")
+
         self.textArea = QPlainTextEdit()
         self.textArea.setMaximumBlockCount(self.wsprDevice.config.debugAreaMaximumBlockCount)
         self.textArea.setReadOnly(True)
@@ -139,6 +141,7 @@ class WSPRUI(QWidget):
     #Create section for buttons
     def initButtonFrame(self):
         sectionBox = QGroupBox("Buttons")
+        sectionBox.setMinimumWidth(250)
         tempLayout = QGridLayout()
         
         buttonSave = QPushButton("Save")
@@ -217,7 +220,6 @@ class WSPRUI(QWidget):
         return sectionBox        
 
     def initDebugSection(self):
-        sectionBox = QGroupBox("Debug")
         tempLayout = QGridLayout()
         sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
         self.textArea.setSizePolicy(sizePolicy)
@@ -225,8 +227,8 @@ class WSPRUI(QWidget):
         #self.textArea.setFixedWidth(400)
         tempLayout.addWidget(self.textArea)
 
-        sectionBox.setLayout(tempLayout)
-        return sectionBox
+        self.debugSection.setLayout(tempLayout)
+        return self.debugSection
 
     #####################################
     #END - Build All section of the UI
@@ -325,6 +327,11 @@ class WSPRUI(QWidget):
     def handleConnectionIconClick(self, arg2 = None):
         self.wsprDevice.config.debug = not self.wsprDevice.config.debug
         self.buttonReload.setVisible(self.wsprDevice.config.debug)
+
+        if self.wsprDevice.config.debug:
+            self.debugSection.setTitle("Debug")
+        else:
+            self.debugSection.setTitle("Info")
         return
 
     def handleReloadPush(self):
