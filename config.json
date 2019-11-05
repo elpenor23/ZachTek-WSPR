@@ -1,15 +1,15 @@
 {
     "bands": [
-            ["0", "2190m (137.500 kHz)", "D"], 
-            ["1", "630m (475.700 kHz)", "D"],
-            ["2", "160m (1.838,100 MHz)", "D"],
-            ["3", "80m (3.594,100 MHz)", "D"],
-            ["4", "40m (7.040,100 MHz)", "D"],
-            ["5", "30m (10.140,200 MHz)", "D"],
-            ["6", "20m (14.097,100 MHz)", "D"],
-            ["7", "17m (18.106,100 MHz)", "D"],
-            ["8", "15m (21.096,100 MHz)", "D"],
-            ["9", "12m (24.926,100 MHz)", "D"],
+            ["00", "2190m (137.500 kHz)", "D"], 
+            ["01", "630m (475.700 kHz)", "D"],
+            ["02", "160m (1.838,100 MHz)", "D"],
+            ["03", "80m (3.594,100 MHz)", "D"],
+            ["04", "40m (7.040,100 MHz)", "D"],
+            ["05", "30m (10.140,200 MHz)", "D"],
+            ["06", "20m (14.097,100 MHz)", "D"],
+            ["07", "17m (18.106,100 MHz)", "D"],
+            ["08", "15m (21.096,100 MHz)", "D"],
+            ["09", "12m (24.926,100 MHz)", "D"],
             ["10", "10m (28.126,100 MHz)", "D"],
             ["11", "6m (50.294,500 MHz)", "D"],
             ["12", "4m (70.092,500 MHz)", "D"]
@@ -25,7 +25,8 @@
     "icons":{
         "dir": "/icons/",
         "disconnected": "icons8-usb-disconnected-50.png",
-        "connected": "icons8-usb-connected-50.png"
+        "connected": "icons8-usb-connected-50.png",
+        "toolTip": "Click to toggle debug mode."
     },
     "error": {
         "dir": "log/",
@@ -33,8 +34,10 @@
     },
     "checkSecurity": true,
     "securityErrorMessage": "Your username does not have access to serial ports./nYou need to add your user to the dialout group./nCopy the line below, change your_username to your username and execute it in the terminal./nThen log out or restart and log back in to activate access./n/nsudo adduser {} dialout",
+    "debugAreaMaximumBlockCount": 400,
     "gpsLockedTrueCSS": "color: green;",
     "gpsLockedFalseCSS": "color: yellow;", 
+    "gpsLockedUnknownCSS": "color: blue;",
     "deviceconstants": {
         "bandEnabledChar": "E",
         "bandDisabledChar": "D",

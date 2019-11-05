@@ -45,6 +45,8 @@ class WSPRUI(QWidget):
         self.rdoCurrentIdle = QRadioButton("Idle")
 
         self.textArea = QPlainTextEdit()
+        self.textArea.setMaximumBlockCount(self.wsprDevice.config.debugAreaMaximumBlockCount)
+        self.textArea.setReadOnly(True)
         
         self.commandArray = [Command.CALLSIGN,
                              Command.BANDS,
@@ -238,19 +240,19 @@ class WSPRUI(QWidget):
         connected = self.wsprDevice.port is not None
         #print(str(self.wsprDevice.port))
         fileName = ""
-        toolTip = ""
+        labelText = ""
         if connected:
             fileName = self.wsprDevice.config.icons["connected"]
-            toolTip = self.wsprDevice.config.connectedtext + str(self.wsprDevice.port.port)
+            labelText = self.wsprDevice.config.connectedtext + str(self.wsprDevice.port.port)
         else:
             fileName = self.wsprDevice.config.icons["disconnected"]
-            toolTip = self.wsprDevice.config.notconnectedtext
+            labelText = self.wsprDevice.config.notconnectedtext
 
-        self.portConnectionLabel.setText(toolTip)
+        self.portConnectionLabel.setText(labelText)
         pixMap = QtGui.QPixmap(fileName)
 
         self.portConnectionIcon.setPixmap(pixMap)
-        self.portConnectionIcon.setToolTip(toolTip)
+        self.portConnectionIcon.setToolTip(self.wsprDevice.config.icons["toolTip"])
 
         return
 
@@ -270,18 +272,18 @@ class WSPRUI(QWidget):
         for i, checkbox in enumerate(self.bandCheckboxes):
             checkbox.setChecked(self.wsprDevice.bands[i][2] == self.wsprDevice.config.deviceconstants.bandEnabledChar)
 
-        if self.wsprDevice.startupMode == "S":
+        if self.wsprDevice.startupMode == self.wsprDevice.config.deviceconstants.modeSignalChar:
             self.rdoStartUpSignalGen.setChecked(True)
-        elif self.wsprDevice.startupMode == "W":
+        elif self.wsprDevice.startupMode == self.wsprDevice.config.deviceconstants.modeWSPRChar:
             self.rdoStartUpWSPRBeacon.setChecked(True)
-        elif self.wsprDevice.startupMode == "N":
+        elif self.wsprDevice.startupMode == self.wsprDevice.config.deviceconstants.modeIdleChar:
             self.rdoStartUpIdle.setChecked(True)
 
-        if self.wsprDevice.currentMode == "S":
+        if self.wsprDevice.currentMode == self.wsprDevice.config.deviceconstants.modeSignalChar:
             self.rdoCurrentSignalGen.setChecked(True)
-        elif self.wsprDevice.currentMode == "W":
+        elif self.wsprDevice.currentMode == self.wsprDevice.config.deviceconstants.modeWSPRChar:
             self.rdoCurrentWSPRBeacon.setChecked(True)
-        elif self.wsprDevice.currentMode == "N":
+        elif self.wsprDevice.currentMode == self.wsprDevice.config.deviceconstants.modeIdleChar:
             self.rdoCurrentIdle.setChecked(True)
 
         return
@@ -301,6 +303,14 @@ class WSPRUI(QWidget):
         self.rdoCurrentWSPRBeacon.setChecked(False)
         self.rdoCurrentIdle.setChecked(True)
 
+        self.CurrentGPSStatus.setValue(0.0)
+        self.gpsLocked.setToolTip("Unknown")
+        self.gpsLocked.setStyleSheet(self.wsprDevice.config.gpsLockedUnknownCSS)
+
+        self.gpsTime.setText("00:00:00")
+        self.gpsPosition.setText("0000")
+        self.gpsPower.setText("00")
+        self.outputFreq.setText("0 000 000 000.00")
         return
 
     #####################################
@@ -348,21 +358,24 @@ class WSPRUI(QWidget):
                 ]
         
         for i, checkbox in enumerate(self.bandCheckboxes):
+            valueToSend = ""
             commands.append(Command.BANDS)
             if checkbox.isChecked():
                 checkboxValue = self.wsprDevice.config.deviceconstants.bandEnabledChar
             else:
                 checkboxValue = self.wsprDevice.config.deviceconstants.bandDisabledChar
+            #set the bands on the device object
+            self.wsprDevice.bands[i][2] = checkboxValue
 
             valueToSend = str(i).zfill(2) + " " + checkboxValue
             values.append(valueToSend)
-
+            
         self.deviceCommunicationThread.sendCommand(CommandType.SET, commands, values)
 
+        #after saving update the device object to have the saved values
         self.wsprDevice.callsign = self.txtCallsign.text()
         self.wsprDevice.startupMode = startUpModeValue
         self.wsprDevice.currentMode = currentModeValue
-        #self.deviceCommunicationThread.sendCommand(CommandType.GET, commands)
         
         return
 
@@ -422,6 +435,7 @@ class WSPRUI(QWidget):
         self.wsprDevice.port = None
         self.setConnectionStatus()
         self.autoDetecThread.resume()
+        self.ClearData()
     #####################################
     #END - Thread Callbacks
     #####################################

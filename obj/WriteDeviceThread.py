@@ -38,6 +38,7 @@ class WriteDeviceThread(QtCore.QThread):
                     else:
                         self.wsprDevice.WriteCommand(commandType, command, valueArray[i])
                         self.wsprDevice.WriteCommand(CommandType.SET, Command.SAVE)
+                        time.sleep(.1)
                         i += 1
                     
                 self.write.emit(True)

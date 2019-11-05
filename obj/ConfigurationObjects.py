@@ -11,9 +11,6 @@ class ConfigObject:
         print("Version: " + self.version)
         print('Bands: ')
         print(self.bands)
-        print("Use Automatic Ports:" + str(self.useAutomaticPorts))
-        print("Manual Ports:")
-        print(self.manualPorts)
         print("Icons:")
         print(self.icons)
         print("Band Enabled Char: " + self.deviceconstants.bandEnabledChar)
@@ -49,7 +46,8 @@ class ConfigObject:
         fullIconPath = os.getcwd() + configData["icons"]["dir"]
         self.icons = {
             "disconnected": fullIconPath + configData["icons"]["disconnected"],
-            "connected": fullIconPath + configData["icons"]["connected"]
+            "connected": fullIconPath + configData["icons"]["connected"],
+            "toolTip": configData["icons"]["toolTip"]
             }
 
         #Security
@@ -59,7 +57,10 @@ class ConfigObject:
         #gps config
         self.gpsLockedFalseCSS = configData["gpsLockedFalseCSS"]
         self.gpsLockedTrueCSS = configData["gpsLockedTrueCSS"]
+        self.gpsLockedUnknownCSS = configData["gpsLockedUnknownCSS"]
 
+        #debug area config
+        self.debugAreaMaximumBlockCount = configData["debugAreaMaximumBlockCount"]
         #Device Specific configuration
         self.deviceconstants = DeviceConstants()
 
