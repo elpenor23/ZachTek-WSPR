@@ -23,6 +23,8 @@ class ReadDeviceThread(QtCore.QThread):
                     self.read.emit(data)
                 except serial.serialutil.SerialException:
                     self.paused = True
+                    if self.wsprDevice.port is not None:
+                        self.wsprDevice.port.close()
                     self.exception.emit("Read Failed. Device disconnected.")
                 
         return

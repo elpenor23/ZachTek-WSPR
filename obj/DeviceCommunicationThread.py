@@ -43,10 +43,21 @@ class DeviceCommunicationThread(QtCore.QThread):
         return
 
     def stop(self):
-        self.readDeviceThread.stop()
-        self.writeDeviceThread.stop()
-        self.readDeviceThread.wait()
-        self.writeDeviceThread.wait()
+        if self.readDeviceThread is not None:
+            self.readDeviceThread.stop()
+        
+        if self.writeDeviceThread is not None:
+            self.writeDeviceThread.stop()
+
+        if self.readDeviceThread is not None:
+            self.readDeviceThread.wait()
+        
+        if self.writeDeviceThread is not None:
+            self.writeDeviceThread.wait()
+        
+        if self.wsprDevice.port is not None:
+            self.wsprDevice.port.close()
+
         self.wait()
         self.exit()
         return

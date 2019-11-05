@@ -43,6 +43,9 @@ class WriteDeviceThread(QtCore.QThread):
                     
                 self.write.emit(True)
             except Exception as ex:
+                self.pause()
+                if self.wsprDevice.port is not None:
+                    self.wsprDevice.port.close()
                 self.exception.emit("Write Failed. Device disconnected.")
         return
     
