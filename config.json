@@ -36,7 +36,7 @@
     "securityErrorMessage": "Your username does not have access to serial ports./nYou need to add your user to the dialout group./nCopy the line below, change your_username to your username and execute it in the terminal./nThen log out or restart and log back in to activate access./n/nsudo adduser {} dialout",
     "debugAreaMaximumBlockCount": 400,
     "gpsLockedTrueCSS": "color: green;",
-    "gpsLockedFalseCSS": "color: yellow;", 
+    "gpsLockedFalseCSS": "color: orange;", 
     "gpsLockedUnknownCSS": "color: blue;",
     "deviceconstants": {
         "bandEnabledChar": "E",
