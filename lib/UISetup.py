@@ -4,7 +4,7 @@
 #interface
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtWidgets import (QWidget, QProgressBar, QLabel, QLineEdit, QRadioButton,
-            QPlainTextEdit, QGridLayout, QGroupBox, QCheckBox, QPushButton, QSizePolicy)
+            QPlainTextEdit, QGridLayout, QGroupBox, QCheckBox, QPushButton, QSizePolicy, QDial)
 from obj.WSPRInterfaceObjects import WSPRInterfaceObject
 from obj.AutoDetectionThread import AutoDetectionThread
 from obj.DeviceCommunicationThread import DeviceCommunicationThread
@@ -23,14 +23,14 @@ class WSPRUI(QWidget):
         self.gpsTime = QLabel("00:00:00")
         self.gpsPosition = QLabel("0000")
         self.gpsPower = QLabel("0")
-        self.outputFreq = QLabel("000 000 000.00")
+        self.outputFreq = QLabel(self.formatFrequency("0"))
+        self.setFrequencyValueLable = QLabel(self.formatFrequency("0"))
+        self.dialFrequency = QDial()
         self.gpsLocked = QLabel("GPS Signal Quality:")
         
         self.portConnectionIcon = QLabel()
         self.portConnectionIcon.setFixedSize(50, 50)
         self.portConnectionIcon.mousePressEvent = self.handleConnectionIconClick
-
-        self.portActive = False
 
         self.txtCallsign = QLineEdit()
 
@@ -82,33 +82,40 @@ class WSPRUI(QWidget):
 
         windowLayout = QGridLayout()
 
+        #First Column
         #serial port section
         serialPort = self.initSerialPortFrame()
         windowLayout.addWidget(serialPort, 0, 0)
         
         #Bands Section
         bands = self.initBandsFrame()
-        windowLayout.addWidget(bands, 1, 0)
+        windowLayout.addWidget(bands, 1, 0, 2, 1)
 
+        #Button Section
+        button = self.initButtonFrame()
+        windowLayout.addWidget(button, 3, 0)
+
+        #Second Column
         #callsign section
         callsign = self.initCallsignFrame()
         windowLayout.addWidget(callsign, 0, 1)
         
-        #Button Section
-        button = self.initButtonFrame()
-        windowLayout.addWidget(button, 2, 0)
-
-        #Startup Config
-        startup = self.initStartupModeFrame()
-        windowLayout.addWidget(startup, 2, 1)
-
         #Current Status
         current =  self.initCurrentStatus()
         windowLayout.addWidget(current, 1, 1)
 
+        #setCurrentStatus Area
+        setCurrent = self.initSetCurrentStatus()
+        windowLayout.addWidget(setCurrent, 2, 1)
+
+        #Startup Config
+        startup = self.initStartupModeFrame()
+        windowLayout.addWidget(startup, 3, 1)
+
+        #Third Column
         #Debug Area
         debug = self.initDebugSection()
-        windowLayout.addWidget(debug, 0,2, 3,1)
+        windowLayout.addWidget(debug, 0, 2, 4, 1)
 
         #Set the layout and window
         self.setLayout(windowLayout)
@@ -231,12 +238,32 @@ class WSPRUI(QWidget):
         sectionBox.setLayout(tempLayout)
         return sectionBox        
 
+    def initSetCurrentStatus(self):
+        sectionBox = QGroupBox("Set Mode")
+        tempLayout = QGridLayout()
+
+        #Output Frequency
+        setFrequencyLabel = QLabel("Output Frequency: ")
+        tempLayout.addWidget(setFrequencyLabel, 0, 0)
+
+        tempLayout.addWidget(self.setFrequencyValueLable, 0, 1)
+        gpsdBmLabel = QLabel("Hz")
+        tempLayout.addWidget(gpsdBmLabel, 0, 2)
+
+        buttonChangeCurrentMode = QPushButton("Start ")
+        buttonChangeCurrentMode.setFixedSize(100, 50)
+        tempLayout.addWidget(buttonChangeCurrentMode, 1, 0)
+        
+        #Signal Frequency
+        tempLayout.setAlignment(QtCore.Qt.AlignTop)
+        sectionBox.setLayout(tempLayout)
+        return sectionBox        
+
     def initDebugSection(self):
         tempLayout = QGridLayout()
         sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
         self.textArea.setSizePolicy(sizePolicy)
         self.textArea.setMinimumWidth(400)
-        #self.textArea.setFixedWidth(400)
         tempLayout.addWidget(self.textArea)
 
         self.debugSection.setLayout(tempLayout)
@@ -275,12 +302,6 @@ class WSPRUI(QWidget):
     #fills all GUI fields with data from the wspr device
     def FillData(self):
         self.txtCallsign.setText(self.wsprDevice.callsign)
-        if self.wsprDevice.generatorfrequency is not None:
-            gHz = self.wsprDevice.generatorfrequency[0:1]
-            decimals = self.wsprDevice.generatorfrequency[10:12]
-            mainDigits = self.wsprDevice.generatorfrequency[1:10]
-            formattedFreq = gHz + " " + ' '.join([mainDigits[i:i+3] for i in range(0, len(mainDigits), 3)]) + "." + decimals
-            self.outputFreq.setText(formattedFreq)
 
         self.gpsPower.setText(self.wsprDevice.power)
 
@@ -318,9 +339,6 @@ class WSPRUI(QWidget):
         self.rdoStartUpWSPRBeacon.setChecked(False)
         self.rdoStartUpIdle.setChecked(True)
 
-        # self.rdoCurrentSignalGen.setChecked(False)
-        # self.rdoCurrentWSPRBeacon.setChecked(False)
-        # self.rdoCurrentIdle.setChecked(True)
         self.valCurrentMode.setText(self.wsprDevice.config.deviceconstants.modeIdleChar)
 
         self.CurrentGPSStatus.setValue(0.0)
@@ -340,6 +358,9 @@ class WSPRUI(QWidget):
     #####################################
     #START - UI Event Handlers
     #####################################
+    def handleDialChanged(self):
+        self.setFrequencyValueLable.setText(str(self.formatFrequency(self.dialFrequency.value())))
+
     def handleConnectionIconClick(self, arg2 = None):
         self.wsprDevice.config.debug = not self.wsprDevice.config.debug
         self.buttonReload.setVisible(self.wsprDevice.config.debug)
@@ -414,8 +435,6 @@ class WSPRUI(QWidget):
             self.wsprDevice.startupMode = request[1]
         elif request[0] == self.wsprDevice.config.deviceconstants.commands.responce.currentmode:
             self.wsprDevice.currentMode = request[1]
-        elif request[0] == self.wsprDevice.config.deviceconstants.commands.responce.generatorfrequency:
-            self.wsprDevice.generatorfrequency = request[1]
         elif request[0] == self.wsprDevice.config.deviceconstants.commands.responce.power:
             self.wsprDevice.power = request[1]
         
@@ -435,7 +454,39 @@ class WSPRUI(QWidget):
                 self.gpsLocked.setStyleSheet(self.wsprDevice.config.gpsLockedTrueCSS)
             else:
                 self.gpsLocked.setStyleSheet(self.wsprDevice.config.gpsLockedFalseCSS)
+        elif request[0] == self.wsprDevice.config.deviceconstants.commands.responce.generatorfrequency:
+            self.wsprDevice.generatorfrequency = request[1]
+            self.displayCurrentModeValues()
+        elif request[0] == self.wsprDevice.config.deviceconstants.commands.responce.transmitting:
+            self.wsprDevice.transmitStatus = request[1]
+            self.displayCurrentModeValues()
+            
+        
+    def displayCurrentModeValues(self):
+        formattedFreq = self.formatFrequency(0)
+        if self.wsprDevice.generatorfrequency is not None:
+            formattedFreq = self.formatFrequency(self.wsprDevice.generatorfrequency)
 
+        if self.wsprDevice.transmitStatus == "T":
+            self.transmitStatus.setStyleSheet(self.wsprDevice.config.transmitOnStatusCSS)
+            self.transmitStatus.setToolTip(self.wsprDevice.config.transmitOnStatusToolTip)
+            self.outputFreq.setText(formattedFreq)
+        else:
+            self.transmitStatus.setStyleSheet(self.wsprDevice.config.transmitOffStatusCSS)
+            self.transmitStatus.setToolTip(self.wsprDevice.config.transmitOffStatusToolTip)
+            self.outputFreq.setText(self.formatFrequency(0))
+        
+        if self.setFrequencyValueLable.text() == self.formatFrequency(0):
+            self.setFrequencyValueLable.setText(formattedFreq)
+
+    def formatFrequency(self, orig_frequency):
+        frequency = str(orig_frequency).zfill(12)
+        gHz = frequency[0:1]
+        decimals = frequency[10:12]
+        mainDigits = frequency[1:10]
+        formattedFreq = gHz + " " + ' '.join([mainDigits[i:i+3] for i in range(0, len(mainDigits), 3)]) + "." + decimals
+        return formattedFreq
+        
     def callbackThreadException(self, error):
         #self.textArea.appendPlainText("EXCEPTION IN THREAD!")
         self.textArea.appendPlainText(error)

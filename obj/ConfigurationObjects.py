@@ -143,6 +143,7 @@ class ConfigObject:
         self.deviceconstants.commands.responce.gpslocked = configData["deviceconstants"]["commands"]["responce"]["gpslocked"]
         self.deviceconstants.commands.responce.gpssatdata = configData["deviceconstants"]["commands"]["responce"]["gpssatdata"]
         self.deviceconstants.commands.responce.deviceinfo = configData["deviceconstants"]["commands"]["responce"]["deviceinfo"]
+        self.deviceconstants.commands.responce.transmitting = configData["deviceconstants"]["commands"]["responce"]["transmitting"]
 
         #Lists
         self.deviceconstants.commands.responcestoload = configData["deviceconstants"]["commands"]["responce"]["responcestoload"]
@@ -200,7 +201,8 @@ class RawCommandObject:
         self.factorysoftwareversion = "",
         self.factorysoftwarerevision = "",
         self.factoryreferenceoscillatorfrequency = "",
-        self.factorylowpassfilterinstalled = ""
+        self.factorylowpassfilterinstalled = "",
+        self.transmitting = ""
 
     def print(self, title = "RawCommandObject"):
         print(title + ":")

@@ -32,14 +32,19 @@ class WriteDeviceThread(QtCore.QThread):
         if not self.paused:
             i = 0
             try:
+                #loop through and send all the commands
                 for command in commandArray:
                     if commandType == CommandType.GET:
                         self.wsprDevice.WriteCommand(commandType, command)
                     else:
                         self.wsprDevice.WriteCommand(commandType, command, valueArray[i])
-                        self.wsprDevice.WriteCommand(CommandType.SET, Command.SAVE)
                         i += 1
                     time.sleep(self.wsprDevice.config.deviceconstants.waitBetweenCommandsInSeconds)
+                
+                #if we are setting stuff we need to save it all
+                if commandType == CommandType.SET:
+                    self.wsprDevice.WriteCommand(CommandType.SET, Command.SAVE)
+
                 self.write.emit(True)
             except Exception as ex:
                 self.pause()

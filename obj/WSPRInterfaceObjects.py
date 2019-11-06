@@ -31,16 +31,14 @@ class WSPRInterfaceObject:
         self._bands = []
         self._callsign = ""
         self._currentMode = Mode
-        #self._liveSignalModeFrequency = ""
         self._startupMode = Mode
         self.power = ""
         self.generatorfrequency = ""
-        #self._GPSStatus = 0
-        #self._wsprTime = ""
         self._port = None
         self.bands = self.config.bands
         self.gpsposition = "0000"
         self.gpstime = ""
+        self.transmitStatus = False
         
         #DEBUG: Printing config so we know what is in there
         #self.config.print()

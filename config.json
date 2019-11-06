@@ -101,9 +101,9 @@
                 "factoryreferenceoscillatorfrequency": "{FRF}",
                 "factorylowpassfilterinstalled": "{FLP}",
                 "responcestoload": ["{DCS}", "{OSM}", "{CCM}", "{DPD}" , "{DGF}", "{OBD}"],
-                "realtimeresponces": ["{GSI}", "{GLC}", "{GL4}", "{GTM}", "{GLC}"],
+                "realtimeresponces": ["{GSI}", "{GLC}", "{GL4}", "{GTM}", "{GLC}", "{TON}", "{DGF}" ],
                 "factorysettings": ["{FPN}", "{FHV}", "{FHR}", "{FSV}", "{FSR}", "{FRF}", "{FLP}"],
-                "alwaysdisplayresponces": ["{MIN}"]
+                "alwaysdisplayresponces": ["{MIN}", "{FPN}", "{FHV}", "{FHR}", "{FSV}", "{FSR}", "{FRF}", "{FLP}"]
             }
         }
     }

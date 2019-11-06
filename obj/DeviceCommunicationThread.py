@@ -133,7 +133,14 @@ class DeviceCommunicationThread(QtCore.QThread):
     def returnRealTimeDataToUI(self, responce, value):
         if responce == self.wsprDevice.config.deviceconstants.commands.responce.gpssatdata:
             self.gpsDataOnging = True
-            self.updateAverageGPSData(value.split()[3])
+            gpsDataSplit = value.split()
+            if len(gpsDataSplit) >= 2:
+                self.updateAverageGPSData(value.split()[3])
+            else:
+                #print("Value: " + value)
+                #something odd happened, just return the responce
+                print("Should be GPS Data: " + responce + "," + value)
+                self.realtime.emit(responce + "," + value)
         else:
             self.realtime.emit(responce + "," + value)
             
