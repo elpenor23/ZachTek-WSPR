@@ -355,10 +355,7 @@ class WSPRUI(QWidget):
         return
     
     def handleSavePush(self):
-        commands = [#Command.CURRENTMODE,
-                    Command.STARTUPMODE,
-                    Command.CALLSIGN
-                    ]
+        commands = [Command.STARTUP_MODE, Command.CALLSIGN]
         startUpModeValue = ""
         if self.rdoStartUpIdle.isChecked():
             startUpModeValue = self.wsprDevice.config.deviceconstants.modeIdleChar
@@ -366,19 +363,8 @@ class WSPRUI(QWidget):
             startUpModeValue = self.wsprDevice.config.deviceconstants.modeSignalChar
         if self.rdoStartUpWSPRBeacon.isChecked():
             startUpModeValue = self.wsprDevice.config.deviceconstants.modeWSPRChar
-        
-        # currentModeValue = ""
-        # if self.rdoCurrentIdle.isChecked():
-        #     currentModeValue = self.wsprDevice.config.deviceconstants.modeIdleChar
-        # if self.rdoCurrentSignalGen.isChecked():
-        #     currentModeValue = self.wsprDevice.config.deviceconstants.modeSignalChar
-        # if self.rdoStartUpWSPRBeacon.isChecked():
-        #     currentModeValue = self.wsprDevice.config.deviceconstants.modeWSPRChar
 
-        values = [#currentModeValue,
-                    startUpModeValue,
-                    self.txtCallsign.text()
-                ]
+        values = [startUpModeValue, self.txtCallsign.text()]
         
         for i, checkbox in enumerate(self.bandCheckboxes):
             valueToSend = ""
@@ -398,7 +384,6 @@ class WSPRUI(QWidget):
         #after saving update the device object to have the saved values
         self.wsprDevice.callsign = self.txtCallsign.text()
         self.wsprDevice.startupMode = startUpModeValue
-        self.wsprDevice.currentMode = currentModeValue
         
         return
 
