@@ -38,12 +38,19 @@
     "gpsLockedTrueCSS": "color: green;",
     "gpsLockedFalseCSS": "color: orange;", 
     "gpsLockedUnknownCSS": "color: blue;",
+    "transmitOnStatusCSS": "background-color: green;border-style: solid; border-width:2px;",
+    "transmitOnStatusToolTip": "Transmitting",
+    "transmitOffStatusToolTip": "Off",
+    "transmitOffStatusCSS": "background-color: transparent;border-style: solid; border-width:2px;",
     "deviceconstants": {
         "bandEnabledChar": "E",
         "bandDisabledChar": "D",
         "modeIdleChar": "N",
+        "modeIdleDescription": "Idle",
         "modeSignalChar": "S",
+        "modeSignalDescription": "Signal Gen Mode",
         "modeWSPRChar": "W",
+        "modeWSPRDescription": "WSPR Mode",
         "commandEndChars": "\r\n",
         "commands":{
             "get":{
@@ -53,7 +60,14 @@
                 "startupmode": "[OSM]",
                 "currentmode": "[CCM]",
                 "power": "[DPD]",
-                "generatorfrequency": "[DGF]"
+                "generatorfrequency": "[DGF]",
+                "factoryproductnumber": "[FPN]",
+                "factoryhardwareversion": "[FHV]",
+                "factoryhardwarerevision": "[FHR]",
+                "factorysoftwareversion": "[FSV]",
+                "factorysoftwarerevision": "[FSR]",
+                "factoryreferenceoscillatorfrequency": "[FRF]",
+                "factorylowpassfilterinstalled": "[FLP]"
             },
             "set":{
                 "char": " S",
@@ -77,8 +91,17 @@
                 "gpslocked": "{GLC}",
                 "power": "{DPD}",
                 "generatorfrequency": "{DGF}",
-                "responcestoload": ["{DCS}", "{OSM}", "{CCM}", "{DPD}" , "{DGF}","{OBD}"],
+                "transmitting": "{TON}",
+                "factoryproductnumber": "{FPN}",
+                "factoryhardwareversion": "{FHV}",
+                "factoryhardwarerevision": "{FHR}",
+                "factorysoftwareversion": "{FSV}",
+                "factorysoftwarerevision": "{FSR}",
+                "factoryreferenceoscillatorfrequency": "{FRF}",
+                "factorylowpassfilterinstalled": "{FLP}",
+                "responcestoload": ["{DCS}", "{OSM}", "{CCM}", "{DPD}" , "{DGF}", "{OBD}"],
                 "realtimeresponces": ["{GSI}", "{GLC}", "{GL4}", "{GTM}", "{GLC}"],
+                "factorysettings": ["{FPN}", "{FHV}", "{FHR}", "{FSV}", "{FSR}", "{FRF}", "{FLP}"],
                 "alwaysdisplayresponces": ["{MIN}"]
             }
         }

@@ -40,9 +40,8 @@ class WSPRUI(QWidget):
         self.rdoStartUpWSPRBeacon = QRadioButton("WSPR Beacon")
         self.rdoStartUpIdle = QRadioButton("Idle")
 
-        self.rdoCurrentSignalGen = QRadioButton("Signal Generator")
-        self.rdoCurrentWSPRBeacon = QRadioButton("WSPR Beacon")
-        self.rdoCurrentIdle = QRadioButton("Idle")
+        self.valCurrentMode = QLabel("")
+        self.transmitStatus = QLabel("")
 
         self.buttonReload = QPushButton("Reload")
         self.buttonReload.setFixedSize(100, 50)
@@ -57,10 +56,17 @@ class WSPRUI(QWidget):
         
         self.commandArray = [Command.CALLSIGN,
                              Command.BANDS,
-                             Command.STARTUPMODE,
-                             Command.CURRENTMODE,
+                             Command.STARTUP_MODE,
+                             Command.CURRENT_MODE,
                              Command.POWER,
-                             Command.GENERATORFREQUENCY]
+                             Command.GENERATOR_FREQUENCY]
+        self.factorySettingsArray = [Command.FACTORY_FREQUENCY_REFERENCE_OSCILLATOR_FREQUENCY,
+                                    Command.FACTORY_HARDWARE_REVISION,
+                                    Command.FACTORY_HARDWARE_VERSION,
+                                    Command.FACTORY_LOWPASS_FINTER_INSTALLED,
+                                    Command.FACTORY_PRODUCT_NUMBER,
+                                    Command.FACTORY_SOFTWARE_REVISION,
+                                    Command.FACTORY_SOFTWARE_VERSION]
         #Create the UI
         self.initUI()
         
@@ -210,10 +216,15 @@ class WSPRUI(QWidget):
         gpsdBmLabel = QLabel("Hz")
         tempLayout.addWidget(gpsdBmLabel, 6, 2)
 
-        tempLayout.addWidget(self.rdoCurrentSignalGen, 7, 0, 1, 2)
-        tempLayout.addWidget(self.rdoCurrentWSPRBeacon, 8, 0, 1, 2)
-        tempLayout.addWidget(self.rdoCurrentIdle, 9, 0, 1, 2)
+        lblCurrentMode = QLabel("Current Mode: ")
+        tempLayout.addWidget(lblCurrentMode, 7, 0)
+        tempLayout.addWidget(self.valCurrentMode, 7, 1)
 
+        self.transmitStatus.setFixedSize(15,15)
+        self.transmitStatus.setStyleSheet(self.wsprDevice.config.transmitOffStatusCSS)
+        self.transmitStatus.setToolTip(self.wsprDevice.config.transmitOffStatusToolTip)
+        tempLayout.addWidget(self.transmitStatus, 7, 2)
+        
         #Signal Frequency
         tempLayout.setAlignment(QtCore.Qt.AlignTop)
         sectionBox.setLayout(tempLayout)
@@ -283,12 +294,15 @@ class WSPRUI(QWidget):
         elif self.wsprDevice.startupMode == self.wsprDevice.config.deviceconstants.modeIdleChar:
             self.rdoStartUpIdle.setChecked(True)
 
+        currentModeDescription = ""
         if self.wsprDevice.currentMode == self.wsprDevice.config.deviceconstants.modeSignalChar:
-            self.rdoCurrentSignalGen.setChecked(True)
+            currentModeDescription = self.wsprDevice.config.deviceconstants.modeSignalDescription
         elif self.wsprDevice.currentMode == self.wsprDevice.config.deviceconstants.modeWSPRChar:
-            self.rdoCurrentWSPRBeacon.setChecked(True)
+            currentModeDescription = self.wsprDevice.config.deviceconstants.modeWSPRDescription
         elif self.wsprDevice.currentMode == self.wsprDevice.config.deviceconstants.modeIdleChar:
-            self.rdoCurrentIdle.setChecked(True)
+            currentModeDescription = self.wsprDevice.config.deviceconstants.modeIdleDescription
+        
+        self.valCurrentMode.setText(currentModeDescription)
 
         return
 
@@ -303,9 +317,10 @@ class WSPRUI(QWidget):
         self.rdoStartUpWSPRBeacon.setChecked(False)
         self.rdoStartUpIdle.setChecked(True)
 
-        self.rdoCurrentSignalGen.setChecked(False)
-        self.rdoCurrentWSPRBeacon.setChecked(False)
-        self.rdoCurrentIdle.setChecked(True)
+        # self.rdoCurrentSignalGen.setChecked(False)
+        # self.rdoCurrentWSPRBeacon.setChecked(False)
+        # self.rdoCurrentIdle.setChecked(True)
+        self.valCurrentMode.setText(self.wsprDevice.config.deviceconstants.modeIdleChar)
 
         self.CurrentGPSStatus.setValue(0.0)
         self.gpsLocked.setToolTip("Unknown")
@@ -339,7 +354,7 @@ class WSPRUI(QWidget):
         return
     
     def handleSavePush(self):
-        commands = [Command.CURRENTMODE,
+        commands = [#Command.CURRENTMODE,
                     Command.STARTUPMODE,
                     Command.CALLSIGN
                     ]
@@ -351,15 +366,15 @@ class WSPRUI(QWidget):
         if self.rdoStartUpWSPRBeacon.isChecked():
             startUpModeValue = self.wsprDevice.config.deviceconstants.modeWSPRChar
         
-        currentModeValue = ""
-        if self.rdoCurrentIdle.isChecked():
-            currentModeValue = self.wsprDevice.config.deviceconstants.modeIdleChar
-        if self.rdoCurrentSignalGen.isChecked():
-            currentModeValue = self.wsprDevice.config.deviceconstants.modeSignalChar
-        if self.rdoStartUpWSPRBeacon.isChecked():
-            currentModeValue = self.wsprDevice.config.deviceconstants.modeWSPRChar
+        # currentModeValue = ""
+        # if self.rdoCurrentIdle.isChecked():
+        #     currentModeValue = self.wsprDevice.config.deviceconstants.modeIdleChar
+        # if self.rdoCurrentSignalGen.isChecked():
+        #     currentModeValue = self.wsprDevice.config.deviceconstants.modeSignalChar
+        # if self.rdoStartUpWSPRBeacon.isChecked():
+        #     currentModeValue = self.wsprDevice.config.deviceconstants.modeWSPRChar
 
-        values = [currentModeValue,
+        values = [#currentModeValue,
                     startUpModeValue,
                     self.txtCallsign.text()
                 ]
@@ -398,6 +413,7 @@ class WSPRUI(QWidget):
         self.autoDetecThread.pause()   
         self.setConnectionStatus()
         self.deviceCommunicationThread.start()
+        self.deviceCommunicationThread.sendCommand(CommandType.GET, self.factorySettingsArray)
         self.deviceCommunicationThread.sendCommand(CommandType.GET, self.commandArray)
         return
     
@@ -436,7 +452,7 @@ class WSPRUI(QWidget):
                 self.gpsLocked.setStyleSheet(self.wsprDevice.config.gpsLockedFalseCSS)
 
     def callbackThreadException(self, error):
-        self.textArea.appendPlainText("EXCEPTION IN THREAD!")
+        #self.textArea.appendPlainText("EXCEPTION IN THREAD!")
         self.textArea.appendPlainText(error)
         self.deviceCommunicationThread.pause()
         self.wsprDevice.port = None

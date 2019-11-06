@@ -11,11 +11,6 @@ QGroupBox::title {
     font-weight: bold;
 }
 
-QProgressBar {
-    border: 2px solid grey;
-    border-radius: 5px;
-}
-
 QProgressBar::chunk {
     background-color: green;
 }

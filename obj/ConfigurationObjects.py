@@ -59,8 +59,15 @@ class ConfigObject:
         self.gpsLockedTrueCSS = configData["gpsLockedTrueCSS"]
         self.gpsLockedUnknownCSS = configData["gpsLockedUnknownCSS"]
 
+        #Transmit config
+        self.transmitOnStatusCSS = configData["transmitOnStatusCSS"]
+        self.transmitOffStatusCSS = configData["transmitOffStatusCSS"]
+        self.transmitOnStatusToolTip = configData["transmitOnStatusToolTip"]
+        self.transmitOffStatusToolTip = configData["transmitOffStatusToolTip"]
+
         #debug area config
         self.debugAreaMaximumBlockCount = configData["debugAreaMaximumBlockCount"]
+
         #Device Specific configuration
         self.deviceconstants = DeviceConstants()
 
@@ -72,6 +79,10 @@ class ConfigObject:
         self.deviceconstants.modeIdleChar = configData["deviceconstants"]["modeIdleChar"]
         self.deviceconstants.modeSignalChar = configData["deviceconstants"]["modeSignalChar"]
         self.deviceconstants.modeWSPRChar = configData["deviceconstants"]["modeWSPRChar"]
+
+        self.deviceconstants.modeIdleDescription = configData["deviceconstants"]["modeIdleDescription"]
+        self.deviceconstants.modeSignalDescription = configData["deviceconstants"]["modeSignalDescription"]
+        self.deviceconstants.modeWSPRDescription = configData["deviceconstants"]["modeWSPRDescription"]
         
         #Device Commands and responces
         self.deviceconstants.commands = CommandObject()
@@ -111,10 +122,14 @@ class ConfigObject:
         self.deviceconstants.commands.set.generatorfrequency = configData["deviceconstants"]["commands"]["set"]["generatorfrequency"]
         self.deviceconstants.commands.responce.generatorfrequency = configData["deviceconstants"]["commands"]["responce"]["generatorfrequency"]
 
-        #Lists
-        self.deviceconstants.commands.responcestoload = configData["deviceconstants"]["commands"]["responce"]["responcestoload"]
-        self.deviceconstants.commands.realtimeresponces = configData["deviceconstants"]["commands"]["responce"]["realtimeresponces"]
-        self.deviceconstants.commands.alwaysdisplayresponces = configData["deviceconstants"]["commands"]["responce"]["alwaysdisplayresponces"]
+        #Get Only
+        self.deviceconstants.commands.get.factoryproductnumber = configData["deviceconstants"]["commands"]["get"]["factoryproductnumber"]
+        self.deviceconstants.commands.get.factoryhardwareversion = configData["deviceconstants"]["commands"]["get"]["factoryhardwareversion"]
+        self.deviceconstants.commands.get.factoryhardwarerevision = configData["deviceconstants"]["commands"]["get"]["factoryhardwarerevision"]
+        self.deviceconstants.commands.get.factorysoftwareversion = configData["deviceconstants"]["commands"]["get"]["factorysoftwareversion"]
+        self.deviceconstants.commands.get.factorysoftwarerevision = configData["deviceconstants"]["commands"]["get"]["factorysoftwarerevision"]
+        self.deviceconstants.commands.get.factoryreferenceoscillatorfrequency = configData["deviceconstants"]["commands"]["get"]["factoryreferenceoscillatorfrequency"]
+        self.deviceconstants.commands.get.factorylowpassfilterinstalled = configData["deviceconstants"]["commands"]["get"]["factorylowpassfilterinstalled"]
 
         #Set Only
         self.deviceconstants.commands.set.save = configData["deviceconstants"]["commands"]["set"]["save"]
@@ -125,6 +140,12 @@ class ConfigObject:
         self.deviceconstants.commands.responce.gpslocked = configData["deviceconstants"]["commands"]["responce"]["gpslocked"]
         self.deviceconstants.commands.responce.gpssatdata = configData["deviceconstants"]["commands"]["responce"]["gpssatdata"]
         self.deviceconstants.commands.responce.deviceinfo = configData["deviceconstants"]["commands"]["responce"]["deviceinfo"]
+
+        #Lists
+        self.deviceconstants.commands.responcestoload = configData["deviceconstants"]["commands"]["responce"]["responcestoload"]
+        self.deviceconstants.commands.realtimeresponces = configData["deviceconstants"]["commands"]["responce"]["realtimeresponces"]
+        self.deviceconstants.commands.alwaysdisplayresponces = configData["deviceconstants"]["commands"]["responce"]["alwaysdisplayresponces"]
+        self.deviceconstants.commands.factorysettings = configData["deviceconstants"]["commands"]["responce"]["factorysettings"]
         return
 
 class DeviceConstants:
@@ -145,6 +166,7 @@ class CommandObject:
         self.responcestoload = []
         self.realtimeresponces = []
         self.alwaysdisplayresponces = []
+        self.factorysettings = []
         
     def print(self, title = "Commands"):
         print(title + ":")
@@ -168,6 +190,13 @@ class RawCommandObject:
         self.gpslocked = ""
         self.power = ""
         self.generatorfrequency = ""
+        self.factoryproductnumber = "",
+        self.factoryhardwareversion = "",
+        self.factoryhardwarerevision = "",
+        self.factorysoftwareversion = "",
+        self.factorysoftwarerevision = "",
+        self.factoryreferenceoscillatorfrequency = "",
+        self.factorylowpassfilterinstalled = ""
 
     def print(self, title = "RawCommandObject"):
         print(title + ":")

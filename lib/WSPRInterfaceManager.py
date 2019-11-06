@@ -22,7 +22,13 @@ class WSPRInterfaceManager:
         for portName in portList:
             serialPort = self.openSerialPort(portName, portReadTimeout)
             responceBytes = serialPort.readline()
-            responce = responceBytes.decode("utf-8")
+            try:
+                responce = responceBytes.decode("utf-8")
+            except Exception as ex:
+                print(responceBytes)
+                print("Exception: " + str(ex))
+                responce = "ERROR"
+                
             if responce.startswith(correctResponce):
                 connectedPort = serialPort
                 break
@@ -71,25 +77,40 @@ class WSPRInterfaceManager:
     #creates commands to send to the device
     def createCommand(self, commands, type, command, value = ""):
         commandString = ""
-        
+        #print(command)
         if command == Command.CALLSIGN:
             commandString = commands.get.callsign
         elif command == Command.BANDS:
             commandString = commands.get.bands
-        elif command == Command.STARTUPMODE:
+        elif command == Command.STARTUP_MODE:
             commandString = commands.get.startupmode
-        elif command == Command.CURRENTMODE:
+        elif command == Command.CURRENT_MODE:
             commandString = commands.get.currentmode
         elif command == Command.POWER:
             commandString = commands.get.power
-        elif command == Command.GENERATORFREQUENCY:
+        elif command == Command.GENERATOR_FREQUENCY:
             commandString = commands.get.generatorfrequency
+        elif command == Command.FACTORY_FREQUENCY_REFERENCE_OSCILLATOR_FREQUENCY:
+            commandString = commands.get.factoryreferenceoscillatorfrequency
+        elif command == Command.FACTORY_HARDWARE_REVISION:
+            commandString = commands.get.factoryhardwarerevision
+        elif command == Command.FACTORY_HARDWARE_VERSION:
+            commandString = commands.get.factoryhardwareversion
+        elif command == Command.FACTORY_PRODUCT_NUMBER:
+            commandString = commands.get.factoryproductnumber
+        elif command == Command.FACTORY_SOFTWARE_REVISION:
+            commandString = commands.get.factorysoftwarerevision
+        elif command == Command.FACTORY_SOFTWARE_VERSION:
+            commandString = commands.get.factorysoftwareversion
+        elif command == Command.FACTORY_LOWPASS_FINTER_INSTALLED:
+            commandString = commands.get.factorylowpassfilterinstalled
+
         elif command == Command.SAVE:
             commandString = commands.set.save
         #ELIF for next command
         else:
             print("Unknown Command!")
-
+        #print(commandString)
         if type == CommandType.GET:
                 commandString += commands.get.char + commands.commandEndChars
         elif type == CommandType.SET:
