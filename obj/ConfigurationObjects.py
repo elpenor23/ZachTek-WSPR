@@ -71,6 +71,9 @@ class ConfigObject:
         #Device Specific configuration
         self.deviceconstants = DeviceConstants()
 
+        #wait time
+        self.deviceconstants.waitBetweenCommandsInSeconds = configData["deviceconstants"]["waitBetweenCommandsInSeconds"]
+        
         #band enabled/disabled chars
         self.deviceconstants.bandEnabledChar = configData["deviceconstants"]["bandEnabledChar"]
         self.deviceconstants.bandDisabledChar = configData["deviceconstants"]["bandDisabledChar"]
@@ -153,6 +156,7 @@ class DeviceConstants:
         self.commands = CommandObject()
         self.bandEnabledChar = ""
         self.bandDisabledChar = ""
+        self.waitBetweenCommandsInSeconds = 0
         self.modeIdleChar = ""
         self.modeSignalChar = ""
         self.modeWSPRChar = ""

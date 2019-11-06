@@ -52,6 +52,7 @@
         "modeWSPRChar": "W",
         "modeWSPRDescription": "WSPR Mode",
         "commandEndChars": "\r\n",
+        "waitBetweenCommandsInSeconds": 0.1,
         "commands":{
             "get":{
                 "char": " G",

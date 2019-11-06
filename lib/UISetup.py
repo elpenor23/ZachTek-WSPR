@@ -60,6 +60,7 @@ class WSPRUI(QWidget):
                              Command.CURRENT_MODE,
                              Command.POWER,
                              Command.GENERATOR_FREQUENCY]
+
         self.factorySettingsArray = [Command.FACTORY_FREQUENCY_REFERENCE_OSCILLATOR_FREQUENCY,
                                     Command.FACTORY_HARDWARE_REVISION,
                                     Command.FACTORY_HARDWARE_VERSION,
@@ -413,8 +414,7 @@ class WSPRUI(QWidget):
         self.autoDetecThread.pause()   
         self.setConnectionStatus()
         self.deviceCommunicationThread.start()
-        self.deviceCommunicationThread.sendCommand(CommandType.GET, self.factorySettingsArray)
-        self.deviceCommunicationThread.sendCommand(CommandType.GET, self.commandArray)
+        self.deviceCommunicationThread.sendCommand(CommandType.GET, self.factorySettingsArray + self.commandArray)
         return
     
     def callbackDeviceRead(self, readText):

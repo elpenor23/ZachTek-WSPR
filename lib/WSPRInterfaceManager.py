@@ -119,13 +119,13 @@ class WSPRInterfaceManager:
         #print("Created Command: " + commandString)
         return commandString.encode("utf-8")
     
-    def sendCommand(self, ser, commands, commandType, command, value = ""):
+    def sendCommand(self, ser, commands, commandType, command, waitTime, value = ""):
         commandToSend = self.createCommand(commands, commandType, command, value)
-        self.waitForPort(ser)
+        self.waitForPort(ser, waitTime)
         ser.write(commandToSend)
         return
     
-    def waitForPort(self, ser):
+    def waitForPort(self, ser, waitTime):
         while not ser.inWaiting():
-            time.sleep(.1)
+            time.sleep(waitTime)
         return

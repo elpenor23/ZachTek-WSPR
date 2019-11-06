@@ -144,7 +144,7 @@ class WSPRInterfaceObject:
         return data
     
     def WriteCommand(self, commandType, command, value = ""):
-        self.WSPRInterfaceManager.sendCommand(self.port, self.config.deviceconstants.commands, commandType, command, value)
+        self.WSPRInterfaceManager.sendCommand(self.port, self.config.deviceconstants.commands, commandType, command, self.config.deviceconstants.waitBetweenCommandsInSeconds, value)
         return
     ###########################
     #END Methods
