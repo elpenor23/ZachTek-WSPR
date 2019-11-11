@@ -15,6 +15,7 @@
             ["12", "4m (70.092,500 MHz)", "D"]
         ],
     "readdevicetimeout": 5,
+    "numberOfGPSSignalsToAverage": 4,
     "debug": false,
     "about": {
         "version": "0.0.1",
@@ -43,6 +44,8 @@
     "transmitOffStatusToolTip": "Off",
     "transmitOffStatusCSS": "background-color: transparent;border-style: solid; border-width:2px;",
     "deviceconstants": {
+        "deviceTrue": "T",
+        "deviceFalse": "F",
         "bandEnabledChar": "E",
         "bandDisabledChar": "D",
         "modeIdleChar": "N",
@@ -53,6 +56,7 @@
         "modeWSPRDescription": "WSPR Mode",
         "commandEndChars": "\r\n",
         "waitBetweenCommandsInSeconds": 0.1,
+        "waitBetweenReadsInSeconds": 0.1,
         "commands":{
             "get":{
                 "char": " G",

@@ -16,7 +16,7 @@ class ReadDeviceThread(QtCore.QThread):
     def run(self):
         #keep reading from the device while it is still there
         while self.keep_going:
-            time.sleep(self.wsprDevice.config.deviceconstants.waitBetweenCommandsInSeconds)
+            time.sleep(self.wsprDevice.config.deviceconstants.waitBetweenReadsInSeconds)
             if not self.paused:
                 try:
                     data = self.wsprDevice.ReadData().replace(self.wsprDevice.config.deviceconstants.commands.commandEndChars, "")

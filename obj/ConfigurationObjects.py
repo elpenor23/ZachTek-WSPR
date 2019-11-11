@@ -41,6 +41,7 @@ class ConfigObject:
         self.connectedtext = configData["connectedText"]
         self.bands = configData["bands"]
         self.readDeviceTimeout = configData["readdevicetimeout"]
+        self.numberOfGPSSignalsToAverage = configData["numberOfGPSSignalsToAverage"]
 
         #icon data
         fullIconPath = os.getcwd() + configData["icons"]["dir"]
@@ -73,6 +74,7 @@ class ConfigObject:
 
         #wait time
         self.deviceconstants.waitBetweenCommandsInSeconds = configData["deviceconstants"]["waitBetweenCommandsInSeconds"]
+        self.deviceconstants.waitBetweenReadsInSeconds = configData["deviceconstants"]["waitBetweenReadsInSeconds"]
         
         #band enabled/disabled chars
         self.deviceconstants.bandEnabledChar = configData["deviceconstants"]["bandEnabledChar"]
@@ -94,6 +96,9 @@ class ConfigObject:
         self.deviceconstants.commands.get.char = configData["deviceconstants"]["commands"]["get"]["char"]
         self.deviceconstants.commands.set.char = configData["deviceconstants"]["commands"]["set"]["char"]
         self.deviceconstants.commands.commandEndChars = configData["deviceconstants"]["commandEndChars"]
+        self.deviceconstants.commands.deviceTrue = configData["deviceconstants"]["deviceTrue"]
+        self.deviceconstants.commands.deviceFalse = configData["deviceconstants"]["deviceFalse"]
+
         
         #callsign
         self.deviceconstants.commands.get.callsign = configData["deviceconstants"]["commands"]["get"]["callsign"]
@@ -158,6 +163,7 @@ class DeviceConstants:
         self.bandEnabledChar = ""
         self.bandDisabledChar = ""
         self.waitBetweenCommandsInSeconds = 0
+        self.waitBetweenReadsInSeconds = 0
         self.modeIdleChar = ""
         self.modeSignalChar = ""
         self.modeWSPRChar = ""
