@@ -40,8 +40,8 @@ class WSPRUI(QWidget):
         self.rdoStartUpWSPRBeacon = QRadioButton("WSPR Beacon")
         self.rdoStartUpIdle = QRadioButton("Idle")
 
-        self.rdoCurrentSignalGen = QCheckBox("Signal Generator")
-        self.rdoCurrentWSPRBeacon = QCheckBox("WSPR Beacon")
+        self.chkCurrentSignalGen = QCheckBox("Signal Generator")
+        self.chkCurrentWSPRBeacon = QCheckBox("WSPR Beacon")
 
         self.valCurrentMode = QLabel("")
         self.transmitStatus = QLabel("")
@@ -50,6 +50,9 @@ class WSPRUI(QWidget):
         self.buttonReload.setFixedSize(100, 50)
         self.buttonReload.clicked.connect(self.handleReloadPush)
         self.buttonReload.setVisible(self.wsprDevice.config.debug)
+
+        self.buttonSave = QPushButton("Save")
+        self.buttonChangeCurrentMode = QPushButton("Start")
 
         self.debugSection = QGroupBox("Info")
 
@@ -161,12 +164,12 @@ class WSPRUI(QWidget):
         sectionBox.setMinimumWidth(250)
         tempLayout = QGridLayout()
         
-        buttonSave = QPushButton("Save")
-        buttonSave.setFixedSize(100, 50)
-        buttonSave.clicked.connect(self.handleSavePush)
+        
+        self.buttonSave.setFixedSize(100, 50)
+        self.buttonSave.clicked.connect(self.handleSavePush)
         
         tempLayout.addWidget(self.buttonReload, 0, 0)
-        tempLayout.addWidget(buttonSave, 0, 1)
+        tempLayout.addWidget(self.buttonSave, 0, 1)
         sectionBox.setLayout(tempLayout)
         return sectionBox
 
@@ -258,35 +261,22 @@ class WSPRUI(QWidget):
         gpsdBmLabel = QLabel("Hz")
         tempLayout.addWidget(gpsdBmLabel, 0, 3)
 
-        buttonChangeCurrentMode = QPushButton("Start")
-        buttonChangeCurrentMode.clicked.connect(self.handleStartCurrentMode)
-        buttonChangeCurrentMode.setFixedSize(100, 50)
-        tempLayout.addWidget(buttonChangeCurrentMode, 1, 0, 2, 1)
+        self.buttonChangeCurrentMode.clicked.connect(self.handleStartCurrentMode)
+        self.buttonChangeCurrentMode.setFixedSize(100, 50)
+        tempLayout.addWidget(self.buttonChangeCurrentMode, 1, 0, 2, 1)
 
-        tempLayout.addWidget(self.rdoCurrentSignalGen, 1, 2)
-        tempLayout.addWidget(self.rdoCurrentWSPRBeacon, 2, 2)
+        tempLayout.addWidget(self.chkCurrentSignalGen, 1, 2)
+        tempLayout.addWidget(self.chkCurrentWSPRBeacon, 2, 2)
+
+        #TODO: Fix This
+        self.chkCurrentSignalGen.stateChanged.connect(self.handleCurrentModeSigGenCheck)
+        self.chkCurrentWSPRBeacon.stateChanged.connect(self.handleCurrentModeWSPRCheck)
 
         #Signal Frequency
         tempLayout.setAlignment(QtCore.Qt.AlignTop)
         sectionBox.setLayout(tempLayout)
         return sectionBox        
-
-    def handleStartCurrentMode(self):
-        if self.rdoCurrentSignalGen.isChecked():
-            originalFreq = self.setFrequencyValueLable.text()
-            formattedFreq = self.formatFrequency(originalFreq).replace(",", "").replace(".", "")
-            print(formattedFreq)
-            #save freq and then save mode
-            print("Mode: " + self.wsprDevice.config.deviceconstants.modeSignalChar)
-        else:
-            #save Mode
-            print("Mode: " + self.wsprDevice.config.deviceconstants.modeWSPRChar)
-        
-    def frequencyTextComplete(self):
-        origVal = self.setFrequencyValueLable.text()
-        newVal = origVal.replace(",", "").replace(".", "")
-        self.setFrequencyValueLable.setText(self.formatFrequency(newVal))
-
+    
     def initDebugSection(self):
         tempLayout = QGridLayout()
         sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
@@ -333,26 +323,14 @@ class WSPRUI(QWidget):
 
         self.gpsPower.setText(self.wsprDevice.power)
 
-        #set the checkboxes
+        #set the band checkboxes
         for i, checkbox in enumerate(self.bandCheckboxes):
             checkbox.setChecked(self.wsprDevice.bands[i][2] == self.wsprDevice.config.deviceconstants.bandEnabledChar)
 
-        if self.wsprDevice.startupMode == self.wsprDevice.config.deviceconstants.modeSignalChar:
-            self.rdoStartUpSignalGen.setChecked(True)
-        elif self.wsprDevice.startupMode == self.wsprDevice.config.deviceconstants.modeWSPRChar:
-            self.rdoStartUpWSPRBeacon.setChecked(True)
-        elif self.wsprDevice.startupMode == self.wsprDevice.config.deviceconstants.modeIdleChar:
-            self.rdoStartUpIdle.setChecked(True)
-
-        currentModeDescription = ""
-        if self.wsprDevice.currentMode == self.wsprDevice.config.deviceconstants.modeSignalChar:
-            currentModeDescription = self.wsprDevice.config.deviceconstants.modeSignalDescription
-        elif self.wsprDevice.currentMode == self.wsprDevice.config.deviceconstants.modeWSPRChar:
-            currentModeDescription = self.wsprDevice.config.deviceconstants.modeWSPRDescription
-        elif self.wsprDevice.currentMode == self.wsprDevice.config.deviceconstants.modeIdleChar:
-            currentModeDescription = self.wsprDevice.config.deviceconstants.modeIdleDescription
-        
-        self.valCurrentMode.setText(currentModeDescription)
+        #set the startup mode radio buttons
+        self.rdoStartUpSignalGen.setChecked(self.wsprDevice.startupMode == self.wsprDevice.config.deviceconstants.modeSignalChar)
+        self.rdoStartUpWSPRBeacon.setChecked(self.wsprDevice.startupMode == self.wsprDevice.config.deviceconstants.modeWSPRChar)
+        self.rdoStartUpIdle.setChecked(self.wsprDevice.startupMode == self.wsprDevice.config.deviceconstants.modeIdleChar)
 
         return
 
@@ -436,6 +414,45 @@ class WSPRUI(QWidget):
         
         return
 
+    def handleCurrentModeWSPRCheck(self):
+        #TODO: Fix This
+        if self.chkCurrentWSPRBeacon.isChecked:
+            self.chkCurrentSignalGen.setChecked(False)
+        return
+            
+    def handleCurrentModeSigGenCheck(self):
+        #TODO: Fix This
+        if self.chkCurrentSignalGen.isChecked:
+            self.chkCurrentWSPRBeacon.setChecked(False)
+        return
+
+    def handleStartCurrentMode(self):
+        commands = []
+        values = []
+        if self.buttonChangeCurrentMode.text() == "Start":
+            if self.chkCurrentSignalGen.isChecked():
+                originalFreq = self.setFrequencyValueLable.text()
+                rawFrequency = self.formatFrequency(originalFreq).replace(",", "").replace(".", "")
+
+                #save Frequency and mode to signal gen
+                commands = [Command.GENERATOR_FREQUENCY, Command.CURRENT_MODE]
+                values = [rawFrequency, self.wsprDevice.config.deviceconstants.modeSignalChar]
+            elif self.chkCurrentWSPRBeacon.isChecked():
+                #save mode to WSPR
+                commands = [Command.GENERATOR_FREQUENCY, Command.CURRENT_MODE]
+                values = [rawFrequency, self.wsprDevice.config.deviceconstants.modeWSPRChar]
+            else:
+                #save Mode to Idle
+                commands = [Command.CURRENT_MODE]
+                values = [self.wsprDevice.config.deviceconstants.modeIdleChar]
+        else:
+            #save Mode to Idle
+                commands = [Command.CURRENT_MODE]
+                values = [self.wsprDevice.config.deviceconstants.modeIdleChar]
+        
+        self.deviceCommunicationThread.sendCommand(CommandType.SET, commands, values)
+        self.deviceCommunicationThread.sendCommand(CommandType.GET, [Command.GENERATOR_FREQUENCY, Command.CURRENT_MODE])
+        return
     #####################################
     #END - UI Event Handlers
     #####################################
@@ -461,8 +478,6 @@ class WSPRUI(QWidget):
             self.wsprDevice.callsign = request[1]
         elif request[0] == self.wsprDevice.config.deviceconstants.commands.responce.startupmode:
             self.wsprDevice.startupMode = request[1]
-        elif request[0] == self.wsprDevice.config.deviceconstants.commands.responce.currentmode:
-            self.wsprDevice.currentMode = request[1]
         elif request[0] == self.wsprDevice.config.deviceconstants.commands.responce.power:
             self.wsprDevice.power = request[1]
         
@@ -472,7 +487,6 @@ class WSPRUI(QWidget):
         request = responce.split(",")
         if request[0] == self.wsprDevice.config.deviceconstants.commands.responce.gpssatdata:
             self.CurrentGPSStatus.setValue(float(request[1]))
-            self.gpsLocked.setToolTip("GPS Quality: " + request[1] + "%")
         elif request[0] == self.wsprDevice.config.deviceconstants.commands.responce.gpsposition:
             self.gpsPosition.setText(request[1])
         elif request[0] == self.wsprDevice.config.deviceconstants.commands.responce.gpstime:
@@ -480,52 +494,20 @@ class WSPRUI(QWidget):
         elif request[0] == self.wsprDevice.config.deviceconstants.commands.responce.gpslocked:
             if request[1] == self.wsprDevice.config.deviceconstants.commands.deviceTrue:
                 self.gpsLocked.setStyleSheet(self.wsprDevice.config.gpsLockedTrueCSS)
+                self.gpsLocked.setToolTip("GPS Locked")
             else:
                 self.gpsLocked.setStyleSheet(self.wsprDevice.config.gpsLockedFalseCSS)
+                self.gpsLocked.setToolTip("...Searching...")
         elif request[0] == self.wsprDevice.config.deviceconstants.commands.responce.generatorfrequency:
             self.wsprDevice.generatorfrequency = request[1]
             self.displayCurrentModeValues()
         elif request[0] == self.wsprDevice.config.deviceconstants.commands.responce.transmitting:
             self.wsprDevice.transmitStatus = request[1]
             self.displayCurrentModeValues()
-            
-        
-    def displayCurrentModeValues(self):
-        formattedFreq = self.formatFrequency(0)
-        #If we have a frequency get it
-        if self.wsprDevice.generatorfrequency is not None:
-            formattedFreq = self.formatFrequency(self.wsprDevice.generatorfrequency)
+        elif request[0] == self.wsprDevice.config.deviceconstants.commands.responce.currentmode:
+            self.wsprDevice.currentMode = request[1]
+            self.displayCurrentModeValues()
 
-        if self.wsprDevice.transmitStatus == self.wsprDevice.config.deviceconstants.commands.deviceTrue:
-            #if we are transmitting
-            self.transmitStatus.setStyleSheet(self.wsprDevice.config.transmitOnStatusCSS)
-            self.transmitStatus.setToolTip(self.wsprDevice.config.transmitOnStatusToolTip)
-            self.outputFreq.setText(formattedFreq)
-
-            #if we are transmitting make the start button a stop button
-            self.wsprDevice.currentMode
-        else:
-            #Not transmitting
-            self.transmitStatus.setStyleSheet(self.wsprDevice.config.transmitOffStatusCSS)
-            self.transmitStatus.setToolTip(self.wsprDevice.config.transmitOffStatusToolTip)
-            self.outputFreq.setText(formattedFreq)
-
-            #not transmitting we should make the stop button back to a start button
-
-         #depending on the mode we should check or uncheck the set mode checkboxes   
-        
-        #only set the set frequency if it has not been set
-        if self.setFrequencyValueLable.text() == self.formatFrequency(0):
-            self.setFrequencyValueLable.setText(formattedFreq)
-
-    def formatFrequency(self, orig_frequency):
-        frequency = str(orig_frequency).replace(",", "").replace(".", "").zfill(12)
-        gHz = frequency[0:1]
-        decimals = frequency[10:12]
-        mainDigits = frequency[1:10]
-        formattedFreq = gHz + "," + ','.join([mainDigits[i:i+3] for i in range(0, len(mainDigits), 3)]) + "." + decimals
-        return formattedFreq
-        
     def callbackThreadException(self, error):
         #self.textArea.appendPlainText("EXCEPTION IN THREAD!")
         self.textArea.appendPlainText(error)
@@ -573,4 +555,66 @@ class WSPRUI(QWidget):
 
     #####################################
     #END - Thread handlers
+    #####################################
+
+    #####################################
+    #START - Helper Functions
+    #####################################
+    def displayCurrentModeValues(self):
+        formattedFreq = self.formatFrequency(0)
+        #If we have a frequency get it
+        if self.wsprDevice.generatorfrequency is not None:
+            formattedFreq = self.formatFrequency(self.wsprDevice.generatorfrequency)
+
+        if self.wsprDevice.transmitStatus == self.wsprDevice.config.deviceconstants.commands.deviceTrue:
+            #if we are transmitting
+            self.transmitStatus.setStyleSheet(self.wsprDevice.config.transmitOnStatusCSS)
+            self.transmitStatus.setToolTip(self.wsprDevice.config.transmitOnStatusToolTip)
+            self.outputFreq.setText(formattedFreq)
+
+            #if we are transmitting make the start button a stop button
+            self.buttonChangeCurrentMode.setText("Stop")
+        else:
+            #Not transmitting
+            self.transmitStatus.setStyleSheet(self.wsprDevice.config.transmitOffStatusCSS)
+            self.transmitStatus.setToolTip(self.wsprDevice.config.transmitOffStatusToolTip)
+            self.outputFreq.setText(formattedFreq)
+
+            #not transmitting we should make the stop button back to a start button
+            self.buttonChangeCurrentMode.setText("Start")
+
+        #depending on the mode we should check or uncheck the set mode checkboxes   
+        self.chkCurrentSignalGen.setChecked(self.wsprDevice.currentMode == self.wsprDevice.config.deviceconstants.modeSignalChar)
+        self.chkCurrentWSPRBeacon.setChecked(self.wsprDevice.currentMode == self.wsprDevice.config.deviceconstants.modeWSPRChar)
+        
+        #Set the current mode description
+        currentModeDescription = ""
+        if self.wsprDevice.currentMode == self.wsprDevice.config.deviceconstants.modeSignalChar:
+            currentModeDescription = self.wsprDevice.config.deviceconstants.modeSignalDescription
+        elif self.wsprDevice.currentMode == self.wsprDevice.config.deviceconstants.modeWSPRChar:
+            currentModeDescription = self.wsprDevice.config.deviceconstants.modeWSPRDescription
+        elif self.wsprDevice.currentMode == self.wsprDevice.config.deviceconstants.modeIdleChar:
+            currentModeDescription = self.wsprDevice.config.deviceconstants.modeIdleDescription
+        
+        self.valCurrentMode.setText(currentModeDescription)
+
+        #only set the set frequency if it has not been set
+        if self.setFrequencyValueLable.text() == self.formatFrequency(0):
+            self.setFrequencyValueLable.setText(formattedFreq)
+
+    def formatFrequency(self, orig_frequency):
+        frequency = str(orig_frequency).replace(",", "").replace(".", "").zfill(12)
+        gHz = frequency[0:1]
+        decimals = frequency[10:12]
+        mainDigits = frequency[1:10]
+        formattedFreq = gHz + "," + ','.join([mainDigits[i:i+3] for i in range(0, len(mainDigits), 3)]) + "." + decimals
+        return formattedFreq
+        
+    def frequencyTextComplete(self):
+        origVal = self.setFrequencyValueLable.text()
+        newVal = origVal.replace(",", "").replace(".", "")
+        self.setFrequencyValueLable.setText(self.formatFrequency(newVal))
+
+    #####################################
+    #END - Helper Functions
     #####################################

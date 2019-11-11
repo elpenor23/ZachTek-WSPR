@@ -25,6 +25,7 @@ class WSPRInterfaceManager:
             try:
                 responce = responceBytes.decode("utf-8")
             except Exception as ex:
+                logError(ErrorLevel.MODERATE, "Bad Start Byte.", ex)
                 print(responceBytes)
                 print("Exception: " + str(ex))
                 responce = "ERROR"
