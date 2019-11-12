@@ -355,6 +355,7 @@ class WSPRUI(QWidget):
         self.gpsPosition.setText("0000")
         self.gpsPower.setText("00")
         self.outputFreq.setText("0 000 000 000.00")
+
         return
 
     #####################################
@@ -378,39 +379,41 @@ class WSPRUI(QWidget):
         return
 
     def handleReloadPush(self):
-        self.deviceCommunicationThread.sendCommand(CommandType.GET, self.commandArray)
+        if self.wsprDevice.port is not None:
+            self.deviceCommunicationThread.sendCommand(CommandType.GET, self.commandArray)
         return
     
     def handleSavePush(self):
-        commands = [Command.STARTUP_MODE, Command.CALLSIGN]
-        startUpModeValue = ""
-        if self.rdoStartUpIdle.isChecked():
-            startUpModeValue = self.wsprDevice.config.deviceconstants.modeIdleChar
-        if self.rdoStartUpSignalGen.isChecked():
-            startUpModeValue = self.wsprDevice.config.deviceconstants.modeSignalChar
-        if self.rdoStartUpWSPRBeacon.isChecked():
-            startUpModeValue = self.wsprDevice.config.deviceconstants.modeWSPRChar
+        if self.wsprDevice.port is not None:
+            commands = [Command.STARTUP_MODE, Command.CALLSIGN]
+            startUpModeValue = ""
+            if self.rdoStartUpIdle.isChecked():
+                startUpModeValue = self.wsprDevice.config.deviceconstants.modeIdleChar
+            if self.rdoStartUpSignalGen.isChecked():
+                startUpModeValue = self.wsprDevice.config.deviceconstants.modeSignalChar
+            if self.rdoStartUpWSPRBeacon.isChecked():
+                startUpModeValue = self.wsprDevice.config.deviceconstants.modeWSPRChar
 
-        values = [startUpModeValue, self.txtCallsign.text()]
-        
-        for i, checkbox in enumerate(self.bandCheckboxes):
-            valueToSend = ""
-            commands.append(Command.BANDS)
-            if checkbox.isChecked():
-                checkboxValue = self.wsprDevice.config.deviceconstants.bandEnabledChar
-            else:
-                checkboxValue = self.wsprDevice.config.deviceconstants.bandDisabledChar
-            #set the bands on the device object
-            self.wsprDevice.bands[i][2] = checkboxValue
-
-            valueToSend = str(i).zfill(2) + " " + checkboxValue
-            values.append(valueToSend)
+            values = [startUpModeValue, self.txtCallsign.text()]
             
-        self.deviceCommunicationThread.sendCommand(CommandType.SET, commands, values)
+            for i, checkbox in enumerate(self.bandCheckboxes):
+                valueToSend = ""
+                commands.append(Command.BANDS)
+                if checkbox.isChecked():
+                    checkboxValue = self.wsprDevice.config.deviceconstants.bandEnabledChar
+                else:
+                    checkboxValue = self.wsprDevice.config.deviceconstants.bandDisabledChar
+                #set the bands on the device object
+                self.wsprDevice.bands[i][2] = checkboxValue
 
-        #after saving update the device object to have the saved values
-        self.wsprDevice.callsign = self.txtCallsign.text()
-        self.wsprDevice.startupMode = startUpModeValue
+                valueToSend = str(i).zfill(2) + " " + checkboxValue
+                values.append(valueToSend)
+                
+            self.deviceCommunicationThread.sendCommand(CommandType.SET, commands, values)
+
+            #after saving update the device object to have the saved values
+            self.wsprDevice.callsign = self.txtCallsign.text()
+            self.wsprDevice.startupMode = startUpModeValue
         
         return
 
@@ -427,31 +430,32 @@ class WSPRUI(QWidget):
         return
 
     def handleStartCurrentMode(self):
-        commands = []
-        values = []
-        if self.buttonChangeCurrentMode.text() == "Start":
-            if self.chkCurrentSignalGen.isChecked():
-                originalFreq = self.setFrequencyValueLable.text()
-                rawFrequency = self.formatFrequency(originalFreq).replace(",", "").replace(".", "")
+        if self.wsprDevice.port is not None:
+            commands = []
+            values = []
+            if self.buttonChangeCurrentMode.text() == "Start":
+                if self.chkCurrentSignalGen.isChecked():
+                    originalFreq = self.setFrequencyValueLable.text()
+                    rawFrequency = self.formatFrequency(originalFreq).replace(",", "").replace(".", "")
 
-                #save Frequency and mode to signal gen
-                commands = [Command.GENERATOR_FREQUENCY, Command.CURRENT_MODE]
-                values = [rawFrequency, self.wsprDevice.config.deviceconstants.modeSignalChar]
-            elif self.chkCurrentWSPRBeacon.isChecked():
-                #save mode to WSPR
-                commands = [Command.GENERATOR_FREQUENCY, Command.CURRENT_MODE]
-                values = [rawFrequency, self.wsprDevice.config.deviceconstants.modeWSPRChar]
+                    #save Frequency and mode to signal gen
+                    commands = [Command.GENERATOR_FREQUENCY, Command.CURRENT_MODE]
+                    values = [rawFrequency, self.wsprDevice.config.deviceconstants.modeSignalChar]
+                elif self.chkCurrentWSPRBeacon.isChecked():
+                    #save mode to WSPR
+                    commands = [Command.GENERATOR_FREQUENCY, Command.CURRENT_MODE]
+                    values = [rawFrequency, self.wsprDevice.config.deviceconstants.modeWSPRChar]
+                else:
+                    #save Mode to Idle
+                    commands = [Command.CURRENT_MODE]
+                    values = [self.wsprDevice.config.deviceconstants.modeIdleChar]
             else:
                 #save Mode to Idle
-                commands = [Command.CURRENT_MODE]
-                values = [self.wsprDevice.config.deviceconstants.modeIdleChar]
-        else:
-            #save Mode to Idle
-                commands = [Command.CURRENT_MODE]
-                values = [self.wsprDevice.config.deviceconstants.modeIdleChar]
-        
-        self.deviceCommunicationThread.sendCommand(CommandType.SET, commands, values)
-        self.deviceCommunicationThread.sendCommand(CommandType.GET, [Command.GENERATOR_FREQUENCY, Command.CURRENT_MODE])
+                    commands = [Command.CURRENT_MODE]
+                    values = [self.wsprDevice.config.deviceconstants.modeIdleChar]
+            
+            self.deviceCommunicationThread.sendCommand(CommandType.SET, commands, values)
+            self.deviceCommunicationThread.sendCommand(CommandType.GET, [Command.GENERATOR_FREQUENCY, Command.CURRENT_MODE])
         return
     #####################################
     #END - UI Event Handlers
