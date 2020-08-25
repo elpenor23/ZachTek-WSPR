@@ -89,6 +89,10 @@ class ConfigObject:
         self.deviceconstants.modeSignalDescription = configData["deviceconstants"]["modeSignalDescription"]
         self.deviceconstants.modeWSPRDescription = configData["deviceconstants"]["modeWSPRDescription"]
         
+        #Location Constants
+        self.deviceconstants.locationStateGPS = configData["deviceconstants"]["locationStateGPS"]
+        self.deviceconstants.locationStateManual = configData["deviceconstants"]["locationStateManual"]
+
         #Device Commands and responces
         self.deviceconstants.commands = CommandObject()
     
@@ -129,6 +133,16 @@ class ConfigObject:
         self.deviceconstants.commands.get.generatorfrequency = configData["deviceconstants"]["commands"]["get"]["generatorfrequency"]
         self.deviceconstants.commands.set.generatorfrequency = configData["deviceconstants"]["commands"]["set"]["generatorfrequency"]
         self.deviceconstants.commands.responce.generatorfrequency = configData["deviceconstants"]["commands"]["responce"]["generatorfrequency"]
+
+        #location state
+        self.deviceconstants.commands.get.locationstate = configData["deviceconstants"]["commands"]["get"]["locationstate"]
+        self.deviceconstants.commands.set.locationstate = configData["deviceconstants"]["commands"]["set"]["locationstate"]
+        self.deviceconstants.commands.responce.locationstate = configData["deviceconstants"]["commands"]["responce"]["locationstate"]
+
+        #location value
+        self.deviceconstants.commands.get.locationvalue = configData["deviceconstants"]["commands"]["get"]["locationvalue"]
+        self.deviceconstants.commands.set.locationvalue = configData["deviceconstants"]["commands"]["set"]["locationvalue"]
+        self.deviceconstants.commands.responce.locationvalue = configData["deviceconstants"]["commands"]["responce"]["locationvalue"]
 
         #Get Only
         self.deviceconstants.commands.get.factoryproductnumber = configData["deviceconstants"]["commands"]["get"]["factoryproductnumber"]
@@ -199,6 +213,8 @@ class RawCommandObject:
         self.gpssatdata = ""
         self.deviceinfo = ""
         self.gpslocked = ""
+        self.locationstate = ""
+        self.locationvalue = ""
         self.power = ""
         self.generatorfrequency = ""
         self.factoryproductnumber = "",
