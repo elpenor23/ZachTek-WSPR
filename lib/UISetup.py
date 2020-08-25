@@ -40,6 +40,10 @@ class WSPRUI(QWidget):
         self.rdoStartUpWSPRBeacon = QRadioButton("WSPR Beacon")
         self.rdoStartUpIdle = QRadioButton("Idle")
 
+        self.pauseAfterTransmission = QLineEdit("120")
+        self.manualLocationSetting = QLineEdit("FN44")
+        self.useManualLocation = QCheckBox()
+
         self.chkCurrentSignalGen = QCheckBox("Signal Generator")
         self.chkCurrentWSPRBeacon = QCheckBox("WSPR Beacon")
 
@@ -102,7 +106,7 @@ class WSPRUI(QWidget):
         windowLayout.addWidget(button, 3, 0)
 
         #Second Column
-        #callsign section
+        #info section
         callsign = self.initCallsignFrame()
         windowLayout.addWidget(callsign, 0, 1)
         
@@ -151,10 +155,10 @@ class WSPRUI(QWidget):
         for band in self.wsprDevice.bands:
             #for each band make a label and a button
             checkbox = QCheckBox(band[1])            
-            tempLayout.addWidget(checkbox, i, 1)
+            tempLayout.addWidget(checkbox, i, 0, 3, 0)
             self.bandCheckboxes.append(checkbox)
             i+=1
-
+        
         sectionBox.setLayout(tempLayout)
         return sectionBox
 
@@ -163,7 +167,6 @@ class WSPRUI(QWidget):
         sectionBox = QGroupBox("Buttons")
         sectionBox.setMinimumWidth(250)
         tempLayout = QGridLayout()
-        
         
         self.buttonSave.setFixedSize(100, 50)
         self.buttonSave.clicked.connect(self.handleSavePush)
@@ -175,10 +178,25 @@ class WSPRUI(QWidget):
 
     #create setion for Callsign input
     def initCallsignFrame(self):
-        sectionBox = QGroupBox("Callsign")
+        sectionBox = QGroupBox("Info")
         tempLayout = QGridLayout()
-        
-        tempLayout.addWidget(self.txtCallsign)
+        self.txtCallsign.setFixedWidth(100)
+
+        tempLayout.addWidget(self.txtCallsign, 0, 0, QtCore.Qt.AlignLeft)
+
+        lablePauseAfter = QLabel("Pause Time:")
+        lableSeconds = QLabel("seconds")
+        self.pauseAfterTransmission.setFixedWidth(75)
+        tempLayout.addWidget(lablePauseAfter, 1, 0)
+        tempLayout.addWidget(self.pauseAfterTransmission, 1, 1, QtCore.Qt.AlignLeft)
+        tempLayout.addWidget(lableSeconds, 1, 2, QtCore.Qt.AlignLeft)
+
+        lableLocationSetting = QLabel("Manual Location:")
+        self.manualLocationSetting.setFixedWidth(75)
+        tempLayout.addWidget(lableLocationSetting, 2, 0)
+        tempLayout.addWidget(self.manualLocationSetting, 2, 1, QtCore.Qt.AlignLeft)
+        tempLayout.addWidget(self.useManualLocation, 2, 2, QtCore.Qt.AlignLeft)
+
         sectionBox.setLayout(tempLayout)
         return sectionBox
 
@@ -186,10 +204,11 @@ class WSPRUI(QWidget):
     def initStartupModeFrame(self):
         sectionBox = QGroupBox("Start Up Configuration")
         tempLayout = QGridLayout()
-        
-        tempLayout.addWidget(self.rdoStartUpSignalGen, 0, 0)
-        tempLayout.addWidget(self.rdoStartUpWSPRBeacon, 1, 0)
-        tempLayout.addWidget(self.rdoStartUpIdle, 2, 0)
+        #tempLayout.setAlignment(QtCore.Qt.AlignTop)
+
+        tempLayout.addWidget(self.rdoStartUpSignalGen, 0, 0, 1, 2)
+        tempLayout.addWidget(self.rdoStartUpWSPRBeacon, 1, 0, 1, 2)
+        tempLayout.addWidget(self.rdoStartUpIdle, 2, 0, 1, 2)
 
         sectionBox.setLayout(tempLayout)
         return sectionBox
@@ -268,7 +287,7 @@ class WSPRUI(QWidget):
         tempLayout.addWidget(self.chkCurrentSignalGen, 1, 2)
         tempLayout.addWidget(self.chkCurrentWSPRBeacon, 2, 2)
 
-        #TODO: Fix This
+        #TODO: Fix This - Should be able to have either 1 or none, not both
         self.chkCurrentSignalGen.stateChanged.connect(self.handleCurrentModeSigGenCheck)
         self.chkCurrentWSPRBeacon.stateChanged.connect(self.handleCurrentModeWSPRCheck)
 
@@ -375,7 +394,7 @@ class WSPRUI(QWidget):
         if self.wsprDevice.config.debug:
             self.debugSection.setTitle("Debug")
         else:
-            self.debugSection.setTitle("Info")
+            self.debugSection.setTitle("Data")
         return
 
     def handleReloadPush(self):
@@ -408,7 +427,16 @@ class WSPRUI(QWidget):
 
                 valueToSend = str(i).zfill(2) + " " + checkboxValue
                 values.append(valueToSend)
-                
+            
+            #location stuff
+            commands.append(Command.LOCATION_STATE)
+            if self.useManualLocation.isChecked:
+                values.append(self.wsprDevice.config.deviceconstants.locationStateManual)
+                commands.append(Command.LOCATION_VALUE)
+                values.append(self.manualLocationSetting.text())
+            else:
+                values.append(self.wsprDevice.config.deviceconstants.locationStateGPS)
+
             self.deviceCommunicationThread.sendCommand(CommandType.SET, commands, values)
 
             #after saving update the device object to have the saved values

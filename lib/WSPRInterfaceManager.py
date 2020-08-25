@@ -105,10 +105,13 @@ class WSPRInterfaceManager:
             commandString = commands.get.factorysoftwareversion
         elif command == Command.FACTORY_LOWPASS_FINTER_INSTALLED:
             commandString = commands.get.factorylowpassfilterinstalled
-
+        elif command == Command.LOCATION_STATE:
+            commandString = commands.get.locationstate
+        elif command == Command.LOCATION_VALUE:
+            commandString = commands.get.locationvalue
+        #ELIF for next command
         elif command == Command.SAVE:
             commandString = commands.set.save
-        #ELIF for next command
         else:
             print("Unknown Command!")
         #print(commandString)

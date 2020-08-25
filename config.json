@@ -21,7 +21,7 @@
         "version": "0.0.1",
         "name": "ZachTek WSPR GUI"
     },
-    "notConnectedText": "Not Connected\nClick to Connect",
+    "notConnectedText": "Not Connected",
     "connectedText": "Connected to Port:\n",
     "icons":{
         "dir": "/icons/",
@@ -54,6 +54,8 @@
         "modeSignalDescription": "Signal Gen Mode",
         "modeWSPRChar": "W",
         "modeWSPRDescription": "WSPR Mode",
+        "locationStateGPS": "G",
+        "locationStateManual": "M",
         "commandEndChars": "\r\n",
         "waitBetweenCommandsInSeconds": 0.1,
         "waitBetweenReadsInSeconds": 0.1,
@@ -72,7 +74,9 @@
                 "factorysoftwareversion": "[FSV]",
                 "factorysoftwarerevision": "[FSR]",
                 "factoryreferenceoscillatorfrequency": "[FRF]",
-                "factorylowpassfilterinstalled": "[FLP]"
+                "factorylowpassfilterinstalled": "[FLP]",
+                "locationstate": "[OCL]",
+                "locationvalue": "[DL4]"
             },
             "set":{
                 "char": " S",
@@ -82,7 +86,9 @@
                 "startupmode": "[OSM]",
                 "currentmode": "[CCM]",
                 "power": "[DPD]",
-                "generatorfrequency": "[DGF]"
+                "generatorfrequency": "[DGF]",
+                "locationstate": "[OCL]",
+                "locationvalue": "[DL4]"
             },
             "responce":{
                 "callsign": "{DCS}",
@@ -104,6 +110,8 @@
                 "factorysoftwarerevision": "{FSR}",
                 "factoryreferenceoscillatorfrequency": "{FRF}",
                 "factorylowpassfilterinstalled": "{FLP}",
+                "locationstate": "{OCL}",
+                "locationvalue": "{DL4}",
                 "responcestoload": ["{DCS}", "{OSM}", "{DPD}" , "{DGF}", "{OBD}"],
                 "realtimeresponces": ["{GSI}", "{GLC}", "{GL4}", "{GTM}", "{GLC}", "{TON}", "{DGF}", "{CCM}" ],
                 "factorysettings": ["{FPN}", "{FHV}", "{FHR}", "{FSV}", "{FSR}", "{FRF}", "{FLP}"],
