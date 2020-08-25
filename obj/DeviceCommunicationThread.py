@@ -134,8 +134,8 @@ class DeviceCommunicationThread(QtCore.QThread):
         if responce == self.wsprDevice.config.deviceconstants.commands.responce.gpssatdata:
             self.gpsDataOnging = True
             gpsDataSplit = value.split()
-            if len(gpsDataSplit) >= 2:
-                self.updateAverageGPSData(value.split()[3])
+            if len(gpsDataSplit) >= 4:
+                self.updateAverageGPSData(gpsDataSplit[3])
             else:
                 #print("Value: " + value)
                 #something odd happened, just return the responce
